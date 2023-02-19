@@ -4,7 +4,7 @@
       <div class="grid grid-cols-2 space-x-6 max-w-6xl mx-auto my-4 h-[38rem] max-h-[38rem]">
         <!-- <prism-editor class="my-editor" v-model="code" :highlight="highlighter" line-numbers></prism-editor> -->
         <CodeEditor theme="light" class="my-editor" :display_language="false" height="38rem" v-model="code"
-          :languages="[['wipple', 'WPL']]"></CodeEditor>
+          :languages="[['tbd', 'TBD']]"></CodeEditor>
         <div class="flex max-h-[inherit] flex-col">
           <span>
             <button class="run_btn mb-2 p-2" v-on:click="compile">Run -></button>
@@ -20,20 +20,26 @@
 
 <script lang="js">
 // import Prism Editor 
-import { PrismEditor } from 'vue-prism-editor';
+// import { PrismEditor } from 'vue-prism-editor';
 import hljs from "highlight.js";
 import CodeEditor from 'simple-code-editor';
 
-hljs.registerLanguage("wipple", (hljs) => ({
-  name: "Wipple",
-  aliases: ["wipple", "wpl"],
+hljs.registerLanguage("tbd", (hljs) => ({
+  name: "Tbd",
+  aliases: ["tbd", "TBD"],
   keywords: {
     keyword: "if while else func define extern match offer return select exit struct enum",
+    type: "int boolean str var Channel Program InternalChoice ExternalChoice"
   },
   contains: [
     {
       className: "comment",
-      begin: /--.*/,
+      begin: /#.*/,
+    },
+    {
+      className: "comment", 
+      begin: /\(\*/, 
+      end: /\*\)/, 
     },
     {
       className: "string",
@@ -54,7 +60,7 @@ hljs.registerLanguage("wipple", (hljs) => ({
 
 export default {
   components: {
-    PrismEditor,
+    // PrismEditor,
     CodeEditor
   },
   data: () => ({
