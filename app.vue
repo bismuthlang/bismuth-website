@@ -1,10 +1,10 @@
 <template>
   <div class="h-100 gradient">
     <client-only placeholder="Loading...">
-      <div class="flex justify-center flex-row space-x-6 max-w-6xl mx-auto my-4 h-[38rem] max-h-max">
-        <prism-editor class="my-editor grow basis-0" v-model="code" :highlight="highlighter" line-numbers></prism-editor>
+      <div class="grid grid-cols-2 space-x-6 max-w-6xl mx-auto my-4 h-[38rem] max-h-[38rem]">
         <!-- <prism-editor class="my-editor" v-model="code" :highlight="highlighter" line-numbers></prism-editor> -->
-        <div class="flex flex-col grow basis-0">
+        <CodeEditor  theme="light" class="my-editor" :display_language="false" height="38rem" v-model="code"  :languages="[['javascript', 'JS']]" ></CodeEditor>
+        <div class="flex max-h-[inherit] flex-col">
           <span>
             <button class="run_btn mb-2 p-2" v-on:click="compile">Run -></button>
           </span>
@@ -18,28 +18,50 @@
 </template>
 
 <script lang="js">
-// import Prism Editor
+// import Prism Editor 
 import { PrismEditor } from 'vue-prism-editor';
-import 'vue-prism-editor/dist/prismeditor.min.css'; // import the styles somewhere
+// import hljs from "highlight.js";
+import CodeEditor from 'simple-code-editor';
 
-// import highlighting library (you can use any library you want just return html string)
-import { highlight, languages } from 'prismjs/components/prism-core';
-import 'prismjs/components/prism-clike';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/themes/prism-dark.css'; // import syntax highlighting styles
+// hljs.registerLanguage("wipple", (hljs) => ({
+//     name: "Wipple",
+//     aliases: ["wipple", "wpl"],
+//     keywords: {
+//         keyword: "if while else func define extern match offer return select exit struct enum",
+//     },
+//     contains: [
+//         {
+//             className: "comment",
+//             begin: /--.*/,
+//         },
+//         {
+//             className: "string",
+//             begin: /"(?:[^"\\]|\\.)*"/,
+//         },
+//         {
+//             className: "type",
+//             begin: /\b[A-Z][^\r\n\t \(\)\[\]\{\}'"/]*\b/,
+//         },
+//         {
+//             className: "number",
+//             begin: /\b-?[0-9]+(\.[0-9]+)?\b/,
+//         },
+//     ],
+// }));
+
+// hljs.initHighlightingOnLoad();
 
 export default {
   components: {
     PrismEditor,
+    CodeEditor
   },
   data: () => ({ 
     code: 'console.log("Hello World")', 
     terminalText: ">"
   }),
   methods: {
-    highlighter(code) {
-      return highlight(code, languages.js); // languages.<insert language> to return html with markup
-    },
+   
     compile: async function () {
       this.terminalText = ">"
       // const { data: resData } = await useFetch('/api/compile')
@@ -52,10 +74,14 @@ export default {
 </script>
 
 <style>
+.inherit-height {
+  max-height: inherit;
+}
 /* required class */
 .my-editor {
   /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
   /* background: #2d2d2d; */
+  /* background-color: transparent !important; */
   color: #3b3535;
 
   font-variant-ligatures: none;
@@ -77,6 +103,11 @@ export default {
 /* optional class for removing the outline */
 .prism-editor__textarea:focus {
   outline: none;
+}
+
+.atom_one_light.hljs, .atom_one_light .hljs {
+/* .atom_one_dark.hljs, .atom_one_dark .hljs  */
+  background-color: transparent !important;
 }
 
 .terminal {
@@ -176,4 +207,6 @@ export default {
 
 .token.entity {
   cursor: help;
-}</style>
+}
+
+</style>
