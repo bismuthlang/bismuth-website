@@ -3,14 +3,15 @@
     <client-only placeholder="Loading...">
       <div class="grid grid-cols-2 space-x-6 max-w-6xl mx-auto my-4 h-[38rem] max-h-[38rem]">
         <!-- <prism-editor class="my-editor" v-model="code" :highlight="highlighter" line-numbers></prism-editor> -->
-        <CodeEditor  theme="light" class="my-editor" :display_language="false" height="38rem" v-model="code"  :languages="[['javascript', 'JS']]" ></CodeEditor>
+        <CodeEditor theme="light" class="my-editor" :display_language="false" height="38rem" v-model="code"
+          :languages="[['wipple', 'WPL']]"></CodeEditor>
         <div class="flex max-h-[inherit] flex-col">
           <span>
             <button class="run_btn mb-2 p-2" v-on:click="compile">Run -></button>
           </span>
           <pre class="terminal h-full p-4 overflow-auto">
 {{ terminalText }}
-          </pre>
+            </pre>
         </div>
       </div>
     </client-only>
@@ -20,34 +21,34 @@
 <script lang="js">
 // import Prism Editor 
 import { PrismEditor } from 'vue-prism-editor';
-// import hljs from "highlight.js";
+import hljs from "highlight.js";
 import CodeEditor from 'simple-code-editor';
 
-// hljs.registerLanguage("wipple", (hljs) => ({
-//     name: "Wipple",
-//     aliases: ["wipple", "wpl"],
-//     keywords: {
-//         keyword: "if while else func define extern match offer return select exit struct enum",
-//     },
-//     contains: [
-//         {
-//             className: "comment",
-//             begin: /--.*/,
-//         },
-//         {
-//             className: "string",
-//             begin: /"(?:[^"\\]|\\.)*"/,
-//         },
-//         {
-//             className: "type",
-//             begin: /\b[A-Z][^\r\n\t \(\)\[\]\{\}'"/]*\b/,
-//         },
-//         {
-//             className: "number",
-//             begin: /\b-?[0-9]+(\.[0-9]+)?\b/,
-//         },
-//     ],
-// }));
+hljs.registerLanguage("wipple", (hljs) => ({
+  name: "Wipple",
+  aliases: ["wipple", "wpl"],
+  keywords: {
+    keyword: "if while else func define extern match offer return select exit struct enum",
+  },
+  contains: [
+    {
+      className: "comment",
+      begin: /--.*/,
+    },
+    {
+      className: "string",
+      begin: /"(?:[^"\\]|\\.)*"/,
+    },
+    {
+      className: "type",
+      begin: /\b[A-Z][^\r\n\t \(\)\[\]\{\}'"/]*\b/,
+    },
+    {
+      className: "number",
+      begin: /\b-?[0-9]+(\.[0-9]+)?\b/,
+    },
+  ],
+}));
 
 // hljs.initHighlightingOnLoad();
 
@@ -56,17 +57,17 @@ export default {
     PrismEditor,
     CodeEditor
   },
-  data: () => ({ 
-    code: 'console.log("Hello World")', 
+  data: () => ({
+    code: 'console.log("Hello World")',
     terminalText: ">"
   }),
   methods: {
-   
+
     compile: async function () {
       this.terminalText = ">"
       // const { data: resData } = await useFetch('/api/compile')
       const { data: resData } = await useFetch('/api/compile', { method: 'post', body: { code: this.code } })
-      this.terminalText = resData._rawValue.data; 
+      this.terminalText = resData._rawValue.data;
       console.log(resData)
     }
   },
@@ -77,6 +78,7 @@ export default {
 .inherit-height {
   max-height: inherit;
 }
+
 /* required class */
 .my-editor {
   /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
@@ -105,8 +107,9 @@ export default {
   outline: none;
 }
 
-.atom_one_light.hljs, .atom_one_light .hljs {
-/* .atom_one_dark.hljs, .atom_one_dark .hljs  */
+.atom_one_light.hljs,
+.atom_one_light .hljs {
+  /* .atom_one_dark.hljs, .atom_one_dark .hljs  */
   background-color: transparent !important;
 }
 
@@ -136,77 +139,4 @@ export default {
 .gradient {
   background: repeating-linear-gradient(45deg, #fff, #fff 28px, #ccc 28px, #ccc 30px);
 }
-
-/* Syntax highlighting */
-.token.comment,
-.token.prolog,
-.token.doctype,
-.token.cdata {
-  color: #90a4ae;
-}
-
-.token.punctuation {
-  color: #9e9e9e;
-}
-
-.namespace {
-  opacity: 0.7;
-}
-
-.token.property,
-.token.tag,
-.token.boolean,
-.token.number,
-.token.constant,
-.token.symbol,
-.token.deleted {
-  color: #e91e63;
-}
-
-.token.selector,
-.token.attr-name,
-.token.string,
-.token.char,
-.token.builtin,
-.token.inserted {
-  color: #4caf50;
-}
-
-.token.operator,
-.token.entity,
-.token.url,
-.language-css .token.string,
-.style .token.string {
-  color: #795548;
-}
-
-.token.atrule,
-.token.attr-value,
-.token.keyword {
-  color: #3f51b5;
-}
-
-.token.function {
-  color: #f44336;
-}
-
-.token.regex,
-.token.important,
-.token.variable {
-  color: #ff9800;
-}
-
-.token.important,
-.token.bold {
-  font-weight: bold;
-}
-
-.token.italic {
-  font-style: italic;
-}
-
-.token.entity {
-  cursor: help;
-}
-
 </style>
