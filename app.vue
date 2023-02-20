@@ -1,7 +1,7 @@
 <template>
-  <div class="h-100 gradient">
+  <div class="h-screen gradient">
     <client-only placeholder="Loading...">
-      <div class="grid grid-cols-2 space-x-6 max-w-6xl mx-auto my-4 h-[38rem] max-h-[38rem]">
+      <div class="grid grid-cols-2 space-x-6 max-w-6xl mx-auto py-4 h-[38rem] max-h-[38rem]">
         <!-- <prism-editor class="my-editor" v-model="code" :highlight="highlighter" line-numbers></prism-editor> -->
         <CodeEditor theme="light" class="my-editor" :display_language="false" height="38rem" v-model="code"
           :languages="[['tbd', 'TBD']]"></CodeEditor>
