@@ -33,13 +33,13 @@ export default defineEventHandler(async (event) => {
         Cmd: ['./compiler', 'input.txt', '--compile=clang']
     })).start({ Detach: false })
 
-
+    //FIXME: ADD TIMEOUT!
     let ans = "";
     try {
         let compileData = await promisifyStream(stream)
         if (compileData.toString().length > 0) {
             // console.log()
-            ans = compileData.toString().substring(8);
+            ans = compileData.toString().substring(8); //https://github.com/AgustinCB/docker-api/issues/71
         }
         else {
             let runStream = await (await _container.exec.create({
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
 
             let runData = await promisifyStream(runStream);
 
-            ans = runData.toString();
+            ans = runData.toString().substring(8); //https://github.com/AgustinCB/docker-api/issues/71
             // console.log();
         }
 

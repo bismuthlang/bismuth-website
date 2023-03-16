@@ -9,7 +9,8 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.4.1",
-    "nuxt": "^3.2.2"
+    "nuxt": "^3.2.2",
+    "sass": "^1.58.3"
   },
   "dependencies": {
     "highlight.js": "^11.7.0",
