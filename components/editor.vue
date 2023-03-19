@@ -20,6 +20,8 @@
 
 <script lang="js">
 
+navigateTo('/')
+
 useServerSeoMeta({
   title: 'Bismuth Editor',
   // ogTitle: 'My Amazing Site',

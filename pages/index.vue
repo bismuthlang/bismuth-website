@@ -1,6 +1,6 @@
 <template>
-  <div v-if="new Date().getTime()/1000 >= 1682049600">
-    <div class="h-screen">
+  <div v-if="new Date().getTime()/1000 < 1682049600">
+    <div class="h-screen" id="home">
       <div class="flex items-center justify-center h-full">
         <div class="text-center font-mono max-w-[350px]">
           <h1 class="text-2xl font-bold my-4">Bismuth is a programming language designed for distributed, concurrent, and mobile tasks.</h1>
@@ -8,15 +8,15 @@
         </div>
       </div>
     </div>
-    <div class="bg-slate-100 w-screen py-4 flex items-center font-mono flex-col">
+    <div id="resources" class="bg-slate-100 w-screen py-4 flex items-center font-mono flex-col">
       <h2 class="text-2xl font-bold my-4">Paper & Other Resources</h2>
       <div class="grid grid-template gap-4">
-        <div class="glass card"><h3 class="text-lg font-bold">PW Poster</h3><img class="h-[200px] m-auto" src="/pw-poster.png"/></div>
-        <div class="glass card"><h3 class="text-lg font-bold">MQP Report</h3><img class="h-[250px]" src="/report.png"/></div>
-        <div class="glass card"><h3 class="text-lg font-bold">CS Poster</h3><img class="h-[200px] m-auto" src="/pw-poster.png"/></div>
+        <a href="/mqp-paper.pdf"><div class="glass card"><h3 class="text-lg font-bold">PW Poster</h3><img class="h-[200px] m-auto" src="/pw-poster.png"/></div></a>
+        <a href="/mqp-paper.pdf"><div class="glass card"><h3 class="text-lg font-bold">MQP Report</h3><img class="h-[250px]" src="/report.png"/></div></a>
+        <a href="/mqp-paper.pdf"><div class="glass card"><h3 class="text-lg font-bold">CS Poster</h3><img class="h-[200px] m-auto" src="/pw-poster.png"/></div></a>
       </div>
     </div>
-    <Editor />
+    <Editor id="editor" />
   </div>
   <div v-else class="h-screen">
         <div class="flex items-center justify-center h-full">
@@ -65,6 +65,13 @@ if (process.server) {
     flex-direction: column;
     align-items: center;
     padding: 6px;
+    user-select: none;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+  }
+
+  .card:hover{
+    transform: scale(1.02);
   }
 
   .glass {

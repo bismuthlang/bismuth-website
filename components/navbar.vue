@@ -1,9 +1,10 @@
 <template>
     <header class="font-mono">
         <nav class="z-50 shadow bg-white fixed top-0 left-0 w-screen leading-[56px] flex flex-row justify-center">
-            <NuxtLink to="/" class="px-5">Home</NuxtLink>
-            <NuxtLink to="/" class="px-5">Editor</NuxtLink>
-            <NuxtLink to="/" class="px-5">Paper</NuxtLink>
+            <NuxtLink to="/#home" class="px-5 underline">Home</NuxtLink>
+            <NuxtLink to="/#resources" class="px-5 underline">Papers</NuxtLink>
+            <NuxtLink to="/#editor" class="px-5 underline">Editor</NuxtLink>
+            <!-- {{ $route.fullPath }} -->
         </nav>
     </header>
 </template>
