@@ -34,29 +34,37 @@ export default defineEventHandler(async (event) => {
     })).start({ Detach: false })
 
     //FIXME: ADD TIMEOUT!
-    let ans = "";
-    try {
-        let compileData = await promisifyStream(stream)
-        if (compileData.toString().length > 0) {
-            // console.log()
-            ans = compileData.toString().substring(8); //https://github.com/AgustinCB/docker-api/issues/71
+    // let ans = "";
+    let compilePromise = new Promise(async function (myResolve, myReject) {
+        try {
+            let compileData = await promisifyStream(stream)
+            if (compileData.toString().length > 0) {
+                // console.log()
+                myResolve(compileData.toString().substring(8)); //https://github.com/AgustinCB/docker-api/issues/71
+            }
+            else {
+                let runStream = await (await _container.exec.create({
+                    AttachStdout: true,
+                    AttachStderr: true,
+                    Cmd: ['./a.out']
+                })).start({ Detach: false })
+
+                let runData = await promisifyStream(runStream);
+
+                myResolve("Compiled Successfully. Output: \n" + runData.toString().substring(8)); //https://github.com/AgustinCB/docker-api/issues/71
+                // console.log();
+            }
+
+        } catch (err) {
+            console.log(err);
+            myReject("Error")
         }
-        else {
-            let runStream = await (await _container.exec.create({
-                AttachStdout: true,
-                AttachStderr: true,
-                Cmd: ['./a.out']
-            })).start({ Detach: false })
+    });
 
-            let runData = await promisifyStream(runStream);
 
-            ans = runData.toString().substring(8); //https://github.com/AgustinCB/docker-api/issues/71
-            // console.log();
-        }
-
-    } catch (err) {
-        console.log(err);
-    }
+    let ans = await Promise.race([compilePromise, new Promise((resolve, reject) => {
+        setTimeout(resolve, 2500, 'Execution took too long (Timed out after 2.5 seconds).');
+    })])
 
     await _container.kill();
 

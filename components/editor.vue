@@ -1,11 +1,10 @@
 <template>
-  <div class="h-screen gradient">
-    <client-only placeholder="Loading...">
-      <div class="grid grid-cols-2 space-x-6 max-w-6xl mx-auto py-4 h-[38rem] max-h-[38rem]">
-        <!-- <prism-editor class="my-editor" v-model="code" :highlight="highlighter" line-numbers></prism-editor> -->
-        <CodeEditor theme="light" class="my-editor" :display_language="false" height="38rem" v-model="code"
+  <div class="gradient py-4">
+    <!-- <client-only placeholder="Loading..."> -->
+      <div class="grid grid-cols-2 space-x-6 max-w-6xl mx-auto">
+        <CodeEditor theme="light" class="my-editor capped-width col-span-2 lg:col-span-1 m-6 lg:m-0" :display_language="false" height="38rem" v-model="code"
           :languages="[['tbd', 'TBD']]"></CodeEditor>
-        <div class="flex max-h-[inherit] flex-col">
+        <div class="flex capped-width max-h-[inherit] flex-col col-span-2 lg:col-span-1 m-6 lg:m-0">
           <span>
             <button class="run_btn mb-2 p-2" v-on:click="compile">Run -></button>
           </span>
@@ -14,13 +13,22 @@
             </pre>
         </div>
       </div>
-    </client-only>
+    <!-- </client-only> -->
   </div>
 </template>
 
+
 <script lang="js">
-// import Prism Editor 
-// import { PrismEditor } from 'vue-prism-editor';
+
+useServerSeoMeta({
+  title: 'Bismuth Editor',
+  // ogTitle: 'My Amazing Site',
+  // description: 'This is my amazing site, let me tell you all about it.',
+  // ogDescription: 'This is my amazing site, let me tell you all about it.',
+  // ogImage: 'https://example.com/image.png',
+  // twitterCard: 'summary_large_image',
+})
+
 import hljs from "highlight.js";
 import CodeEditor from 'simple-code-editor';
 
@@ -85,9 +93,13 @@ export default {
   max-height: inherit;
 }
 
+.capped-width {
+  width: calc(100% - 3rem) !important;
+}
+
 /* required class */
 .my-editor {
-  /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
+  /* we don't use `language-` classes anymore so thats why we need to add background and text color manually */
   /* background: #2d2d2d; */
   /* background-color: transparent !important; */
   color: #3b3535;
