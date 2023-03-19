@@ -68,7 +68,6 @@ hljs.registerLanguage("tbd", (hljs) => ({
 
 export default {
   components: {
-    // PrismEditor,
     CodeEditor
   },
   data: () => ({
@@ -99,7 +98,7 @@ export default {
 
 /* required class */
 .my-editor {
-  /* we dont use `language-` classes anymore so thats why we need to add background and text color manually */
+  /* we don't use `language-` classes anymore so thats why we need to add background and text color manually */
   /* background: #2d2d2d; */
   /* background-color: transparent !important; */
   color: #3b3535;
