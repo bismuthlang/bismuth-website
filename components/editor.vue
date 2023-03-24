@@ -20,7 +20,7 @@
 
 <script lang="js">
 
-navigateTo('/')
+// navigateTo('/')
 
 useServerSeoMeta({
   title: 'Bismuth Editor',
@@ -84,7 +84,7 @@ export default {
       // const { data: resData } = await useFetch('/api/compile')
       const { data: resData } = await useFetch('/api/compile', { method: 'post', body: { code: this.code } })
       this.terminalText = resData._rawValue.data;
-      console.log(resData)
+      // console.log(resData)
     }
   },
 };
