@@ -99,70 +99,10 @@ export default {
     },
     selectChange: async function(event) {
       console.log(event.target.value); 
+      const { data: resData } = await useFetch('/api/getSamplePrograms', { method: 'get'});
+      console.log(resData._rawValue.Programs); 
 
-      /*
-      define struct Empty {}
-define struct Value {int v;}
-define enum OptVal {Empty, Value}
-
-define Database :: c : Channel<
-                        !ExternalChoice<
-                              +int;-OptVal,
-                              +int;+Value,
-                              +int;InternalChoice<
-                                       -Value;+Value,
-                                       +Value>>> = {
-
-  Value[20] data; 
-
-  define func Lookup(Value[20] d, int k) : OptVal {
-     if k < 0 | k >= 20 { return Empty::init(); }
-     return d[k]; 
-  }
-
-  accept(c) {
-    offer c 
-      | +int;-OptVal => c.send(data[c.recv()])
-      | +int;+Value => {
-            var key := c.recv(); 
-            data[key] := c.recv(); 
-        }
-      | +int;InternalChoice<-Value;+Value,+Value> => {
-          var k := c.recv();
-          
-          c[+Value]
-          data[k] := c.recv();
-        }
-  }
-}
-
-define program :: c : Channel<-int> = {
-    var db := exec Database;
-    var rqs := exec requests;
-
-    var setRq;
-
-    accept(rqs) {
-      acceptWhile(setRq, true) {more(db); link(setRq, db)}
-      more(db)
-      link(rqs, db)
-    }
-    accept(writes) { more(db); link(setRq, db) }
-    weaken(db)
-    c.send(0);
-}
-
-define requests :: c : Channel<
-                        ?InternalChoice<
-                              -int;+OptVal,
-                              -int;-Value,
-                              -int;ExternalChoice<
-                                       +Value;-Value,
-                                       -Value>>> = {
-
-    weaken(c)
-}
-*/
+  
 
       const Programs = {
         db: "Database", 
