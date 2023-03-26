@@ -20,7 +20,7 @@ const { data: Programs } = await useFetch('/api/getSamplePrograms', { method: 'g
           :languages="[['tbd', 'TBD']]"></CodeEditor>
         </div>
 
-        <div class="flex capped-width max-h-[calc(38rem + 50px)] flex-col col-span-2 lg:col-span-1 m-6 lg:m-0 lg:pt-[50px]">
+        <div class="flex capped-width max-h-[41.125rem] flex-col col-span-2 lg:col-span-1 m-6 lg:m-0 lg:pt-[50px]">
           <pre class="terminal h-full p-4 overflow-auto">
 {{ terminalText }}
             </pre>
