@@ -6,9 +6,7 @@ const { data: Programs } = await useFetch('/api/getSamplePrograms', { method: 'g
   <div class="gradient py-4">
     <!-- <client-only placeholder="Loading..."> -->
       <div class="grid grid-cols-2 space-x-6 max-w-6xl mx-auto">
-        <CodeEditor font_size="15px" theme="light" class="my-editor capped-width col-span-2 lg:col-span-1 m-6 lg:m-0" :display_language="false" height="38rem" v-model="code"
-          :languages="[['tbd', 'TBD']]"></CodeEditor>
-        <div class="flex capped-width max-h-[38rem] flex-col col-span-2 lg:col-span-1 m-6 lg:m-0">
+        <div class="flex flex-col col-span-2 lg:col-span-1 m-6 lg:m-0">
           <span class="flex">
             <button disabled v-if="isLoading" class="run_btn mb-2 p-2 flex" v-on:click="compile">Run  <Spinner class="ml-2"/> </button>
             <button v-else class="run_btn mb-2 p-2" v-on:click="compile">Run -> </button>
@@ -18,6 +16,11 @@ const { data: Programs } = await useFetch('/api/getSamplePrograms', { method: 'g
               <option v-for="pid in Object.keys(Programs.Programs)" :value="pid">{{ Programs.Programs[pid].name }}</option>
             </select>
           </span>
+          <CodeEditor font_size="15px" theme="light" class="my-editor col-span-2 lg:col-span-1 lg:m-0" :display_language="false" height="38rem" v-model="code"
+          :languages="[['tbd', 'TBD']]"></CodeEditor>
+        </div>
+
+        <div class="flex capped-width max-h-[calc(38rem + 50px)] flex-col col-span-2 lg:col-span-1 m-6 lg:m-0 lg:pt-[50px]">
           <pre class="terminal h-full p-4 overflow-auto">
 {{ terminalText }}
             </pre>
@@ -138,6 +141,8 @@ export default {
   -webkit-backdrop-filter: blur(4px);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
+
+  width: 100% !important;
 }
 
 /* optional class for removing the outline */

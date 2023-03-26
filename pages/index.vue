@@ -70,7 +70,7 @@ export default defineNuxtComponent({
 
     const ip = cfConnectingIp || xForwardedFor || xRealIp || "";
     const ans  = new Date().getTime() / 1000 >= 1682049600 || ip.toString() === "::ffff:127.0.0.1" || ip.toString().startsWith("130.215.") || ip.toString() === "75.143.39.252" || ip.toString() === "2600:6c64:617f:7885:7da8:6d9f:2734:f8c7";
-    console.log('IP ', ip, ans, headers)
+    // console.log('IP ', ip, ans, headers)
     return {
       isAvailable: ans
     }
