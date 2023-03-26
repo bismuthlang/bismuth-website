@@ -19,18 +19,21 @@ export default defineEventHandler(async (event) => {
     //FIXME: error handle if not present!
 
     var pack = tar.pack()
-    pack.entry({ name: 'input.txt' }, body.code);
+    pack.entry({ name: 'input.txt', gid: 1001, uid: 1001 }, body.code);
     pack.finalize();
 
     let _container = await (await docker.container.create({ Image: 'pl-repl' })).start();
 
 
-    await _container.fs.put(pack, { path: '/home' });
+    await _container.fs.put(pack, { path: '/home/my-service/Sandbox' });
 
     let stream = await (await _container.exec.create({
         AttachStdout: false,
         AttachStderr: true,
-        Cmd: ['./compiler', 'input.txt', '--compile=clang']
+        Cmd: ['./compiler', 'input.txt', '--compile=clang', '--demo-mode'],
+        // AttachStdout: true,
+        // AttachStderr: true,
+        // // Cmd: ['ls', '-al']
     })).start({ Detach: false })
 
     let compilePromise = new Promise(async function (myResolve, myReject) {

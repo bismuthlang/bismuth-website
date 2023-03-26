@@ -6,7 +6,7 @@ const { data: Programs } = await useFetch('/api/getSamplePrograms', { method: 'g
   <div class="gradient py-4">
     <!-- <client-only placeholder="Loading..."> -->
       <div class="grid grid-cols-2 space-x-6 max-w-6xl mx-auto">
-        <CodeEditor theme="light" class="my-editor capped-width col-span-2 lg:col-span-1 m-6 lg:m-0" :display_language="false" height="38rem" v-model="code"
+        <CodeEditor font_size="15px" theme="light" class="my-editor capped-width col-span-2 lg:col-span-1 m-6 lg:m-0" :display_language="false" height="38rem" v-model="code"
           :languages="[['tbd', 'TBD']]"></CodeEditor>
         <div class="flex capped-width max-h-[38rem] flex-col col-span-2 lg:col-span-1 m-6 lg:m-0">
           <span class="flex">
@@ -36,7 +36,7 @@ hljs.registerLanguage("tbd", (hljs) => ({
   name: "Tbd",
   aliases: ["tbd", "TBD"],
   keywords: {
-    keyword: "if while else func define extern match offer return select exit struct enum",
+    keyword: "if while else func define extern match offer return select exit struct enum accept acceptWhile more weaken",
     type: "int boolean str var Channel Program InternalChoice ExternalChoice"
   },
   contains: [
@@ -129,7 +129,6 @@ export default {
 
   /* you must provide font-family font-size line-height. Example: */
   font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
-  font-size: 14px;
   line-height: 1.5;
   padding: 5px;
 
@@ -153,7 +152,9 @@ export default {
 }
 
 .terminal {
+  font-size: 15px; 
   font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+  font-variant-ligatures: none;
   color: whitesmoke;
 
   background: rgba(25, 23, 23, 0.7);
