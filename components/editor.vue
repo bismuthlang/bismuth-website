@@ -131,7 +131,7 @@ export default {
   font-variant-ligatures: none;
 
   /* you must provide font-family font-size line-height. Example: */
-  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+  font-family: Fira code, Fira Mono, Consolas, Menlo, monospace;
   line-height: 1.5;
   padding: 5px;
 
@@ -158,8 +158,7 @@ export default {
 
 .terminal {
   font-size: 15px; 
-  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
-  font-variant-ligatures: none;
+  font-family: Consolas, Monaco, monospace;
   color: whitesmoke;
 
   background: rgba(25, 23, 23, 0.7);
@@ -171,7 +170,7 @@ export default {
 }
 
 .run_btn {
-  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+  font-family: Fira code, Fira Mono, Consolas, monospace;
 
   background: rgba(117, 197, 27, 0.6);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
@@ -186,7 +185,7 @@ export default {
 }
 
 .program_select {
-  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
+  font-family: Fira code, Fira Mono, Consolas, monospace;
 
   background: rgba(87, 90, 85, 0.6);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);

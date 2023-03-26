@@ -72,7 +72,7 @@ export default defineNuxtComponent({
     const ans  = new Date().getTime() / 1000 >= 1682049600 || ip.toString() === "::ffff:127.0.0.1" || ip.toString().startsWith("130.215.") || ip.toString() === "75.143.39.252" || ip.toString() === "2600:6c64:617f:7885:7da8:6d9f:2734:f8c7";
     // console.log('IP ', ip, ans, headers)
     return {
-      isAvailable: ans
+      isAvailable: true
     }
   }
 })
@@ -111,35 +111,6 @@ export default defineNuxtComponent({
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.inherit-height {
-  max-height: inherit;
-}
 
-.terminal {
-  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
-  color: whitesmoke;
-
-  background: rgba(25, 23, 23, 0.7);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.run_btn {
-  font-family: Fira code, Fira Mono, Consolas, Menlo, Courier, monospace;
-
-  background: rgba(117, 197, 27, 0.6);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.gradient {
-  background: repeating-linear-gradient(45deg, #fff, #fff 28px, #ccc 28px, #ccc 30px);
-}
 </style>
   
