@@ -11,9 +11,9 @@ const { data: Programs } = await useFetch('/api/getSamplePrograms', { method: 'g
             <button disabled v-if="isLoading" class="run_btn mb-2 p-2 flex" v-on:click="compile">Run  <Spinner class="ml-2"/> </button>
             <button v-else class="run_btn mb-2 p-2" v-on:click="compile">Run -> </button>
             
-            <select v-on:change="$event => selectChange(Programs.Programs[$event.target.value]?.code)" :disabled="isLoading" name="Program" class="program_select mx-4 mb-2 p-2">
+            <select v-on:change="$event => selectChange(Programs[$event.target.value])" :disabled="isLoading" name="Program" class="program_select mx-4 mb-2 p-2">
               <option hidden disabled selected value> Load Sample Program </option>
-              <option v-for="pid in Object.keys(Programs.Programs)" :value="pid">{{ Programs.Programs[pid].name }}</option>
+              <option v-for="pid in Object.keys(Programs)" :value="pid">{{ pid }}</option>
             </select>
           </span>
           <CodeEditor font_size="15px" theme="light" class="my-editor col-span-2 lg:col-span-1 lg:m-0" :display_language="false" height="38rem" v-model="code"

@@ -1,27 +1,19 @@
 export default defineEventHandler(async (event) => {
-    return {
-        Programs: {
-            hw: {
-              name: "Hello World!", 
-              code: `extern int func printf(str s, ...); # Import printf
+  return {
+    "Hello World": hwCode,
+    "Binary Tree": btCode,
+    "Database": dbCode,
+
+  }
+})
+
+const hwCode = `extern int func printf(str s, ...); # Import printf
 
 # Define the main program in the system. 
 define program :: c : Channel<-int> = {
   printf("Hello, World!\\n");
   c.send(0)
 }`
-            },
-            bt: {
-                name: "Binary Tree", 
-                code: btCode
-            },
-            db: {
-              name: "Database", 
-              code: dbCode
-            }
-        }
-    }
-})
 
 const btCode = `extern int func printf(str s, ...);
 
