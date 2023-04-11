@@ -3,6 +3,9 @@ export default defineEventHandler(async (event) => {
     "Hello World": hwCode,
     "Binary Tree": btCode,
     "Database": dbCode,
+    "Fibonacci Sequence": fibCode,
+    "Prime Number Finder": isPrime, 
+    "Binary Stream Adder": adderCode,
 
   }
 })
@@ -191,15 +194,15 @@ define program :: c : Channel<-int> = {
     var rqs := exec requests;
 
     var setRq := exec writeRequest; 
-   
-    acceptWhile(setRq, true) {
+
+    accept(rqs) {
+
+      acceptWhile(setRq, true) {
         more(db); 
         db[-int;-Value]
         db.send(setRq.recv())
         db.send(setRq.recv())
       }
-
-    accept(rqs) {
    
       more(db)
       offer rqs 
@@ -274,4 +277,167 @@ define writeRequest :: c : Channel<?(-int;-Value)> = {
     c.send(Value::init(2))
     
     weaken(c)
+}`
+
+const fibCode = `extern int func printf(str s,...);
+
+define fib :: c : Channel<+int;-int> = {
+  int n := c.recv(); 
+
+  if(n == 0 | n == 1) {
+    c.send(n) exit
+  }
+
+  Channel<-int;+int> f1 := exec fib; 
+  Channel<-int;+int> f2 := exec fib; 
+
+  f1.send(n - 1)
+  f2.send(n - 2)
+
+  int v1 := f1.recv(), v2 := f2.recv();
+
+  c.send(v1 + v2)
+}
+
+define program :: c : Channel<-int> = {
+ var current := 1;        
+ while current < 10 { 
+    Channel<-int;+int> f := exec fib; 
+    f.send(current)
+    int i := f.recv();
+
+   printf("The %dth fibonacci number is: %d\\n", current, i);
+   current := current + 1; 
+ }
+  c.send(-1)
+}`
+
+const isPrime = `extern int func printf(str s,...);
+
+# Function version of isPrime
+define func isPrimeFunc(int n) : boolean {
+  var i := 3;
+  while (i < n) { 
+    if (n / i * i == n) { return false; } 
+    i := i + 2;
+  }
+  return true;
+}
+
+# Program version of isPrime
+define isPrimeProg :: c : Channel<+int;-boolean> = {
+  int n := c.recv();
+  var i := 3, done := false, ans := true;
+
+  while (!done & i < n) { 
+    if (n / i * i == n) { 
+      done := true; 
+      ans := false; 
+    }
+    else  
+    {
+      i := i + 2;
+    }
+  }
+  c.send(ans)
+}
+
+define program :: c : Channel<-int> = {
+  var current := 3;        
+  int nPrimes := 2;
+  while current < 100 { 
+    Channel<-int; +boolean> c1 := exec isPrimeProg; 
+    c1.send(current)
+    boolean ans := c1.recv();
+
+    if ans { 
+      printf("%d is the %dth prime!\\n", current, nPrimes);
+      nPrimes := nPrimes + 1;
+    }
+    current := current + 2;
+  }
+  c.send(nPrimes)
+}`
+
+const adderCode = `extern int func printf(str s, ...);
+
+define program :: c : Channel<-int> = {
+    var addStream := exec BinaryCounter;
+    addStream.send(exec Num7);
+    addStream.send(exec Num5);
+
+    accept(addStream) {
+        printf("%s",(boolean b) : str {
+            if b { return "1"; }
+            return "0";
+        }(addStream.recv()));
+    }
+    printf("\n");
+
+    c.send(0); 
+}
+
+define func XOR (boolean a, boolean b) : boolean {
+    return (a & !b) | (!a & b);
+}
+define BinaryCounter :: c : Channel<+Channel<!+boolean>; +Channel<!+boolean>;?-boolean> = {
+    var i1 := c.recv(), i2 := c.recv();
+
+    boolean carry := false; 
+    boolean shouldLoop := true; 
+    while shouldLoop {
+        boolean looped1 := false; 
+        boolean val1 := false; 
+        acceptWhile(i1, !looped1) {val1 := i1.recv(); looped1 := true;}
+
+        boolean looped2, val2 := false; 
+        acceptWhile(i2, !looped2) {val2 := i2.recv(); looped2 := true;}
+
+        shouldLoop := looped1 & looped2; 
+        boolean xor := XOR(val1, val2); 
+        boolean sum := XOR(xor, carry); 
+        boolean car := (xor & carry) | (val1 & val2);
+        more(c);
+        c.send(sum);
+        carry := car;  
+    }
+    # Only one or the other of the accepts will end up running
+    accept(i1) {
+        boolean val := i1.recv(); 
+        more(c); 
+        c.send(XOR(val, carry));
+        carry := val & carry; 
+    }
+    accept(i2) {
+        boolean val := i2.recv(); 
+        more(c); 
+        c.send(XOR(val, carry));
+        carry := val & carry; 
+    }
+    if carry {
+        more(c); 
+        c.send(carry);
+    }
+
+    weaken(c);  
+}
+
+define Num7 :: c : Channel<?-boolean> = {
+    more(c); 
+    c.send(true); 
+    more(c); 
+    c.send(true); 
+    more(c)
+    c.send(true); 
+    weaken(c); 
+}
+
+define Num5 :: c : Channel<?-boolean> = {
+    more(c); 
+    c.send(true); 
+    more(c); 
+    c.send(false); 
+    more(c)
+    c.send(true); 
+    weaken(c); 
 }`

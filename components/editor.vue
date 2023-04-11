@@ -91,7 +91,8 @@ export default {
     },
     selectChange: async function(Programs)  {
       // this.code = this.Programs[event.target.value]?.code || "";
-      this.code = Programs || "";
+      if(Programs) this.code = Programs
+      // this.code = Programs || "";
     },
   },
 };
