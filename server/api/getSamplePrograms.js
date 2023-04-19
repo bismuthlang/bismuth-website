@@ -141,6 +141,16 @@ define struct Empty {}
 define struct Value {int v;}
 define enum OptVal {Empty, Value}
 
+# The Database program serves an external choice of 
+# either: 
+#   1. Receiving an integer key and returning an OptVal which 
+#      stores either the Value corresponding to the key or Empty 
+#      should the key be invalid. 
+#   2. Receiving an integer key followed by a Value. This inserts the 
+#      specified value into the database corresponding to the provided key. 
+#   3. Receiving an integer key to lookup. If this key is in the database, 
+#      then the current Value corresponding to the key is returned. Either way, 
+#      the process then receives a new Value to store correlating to this key.  
 define Database :: c : Channel<
                         !ExternalChoice<
                               +int;-OptVal,
@@ -151,11 +161,13 @@ define Database :: c : Channel<
 
   Value[10] data; 
 
+  # Helper function to look up a value in the database. 
   define func Lookup(Value[10] d, int k) : OptVal {
      if k < 0 | k >= 10 { return Empty::init(); }
      return d[k]; 
   }
 
+  # Helper function to log the contents of teh database
   define func PrintDatabase(Value[10] data) {
       var i := 0; 
       while i < data.length {
@@ -190,12 +202,13 @@ define Database :: c : Channel<
 }
 
 define program :: c : Channel<-int> = {
-    var db := exec Database;
-    var rqs := exec requests;
+    var db := exec Database;  # Database to send requests to
+    var rqs := exec requests; # Regular priority requests
 
-    var setRq := exec writeRequest; 
+    var setRq := exec writeRequest; # High-priority requests
 
-    accept(rqs) {
+    # Process each of the requests with high-priority requests taking precedence
+    accept(rqs) { 
 
       acceptWhile(setRq, true) {
         more(db); 
@@ -361,59 +374,61 @@ define program :: c : Channel<-int> = {
 
 const adderCode = `extern int func printf(str s, ...);
 
+# Main program 
+# - Spawns a BinaryCounter and toDecimal process
+# - Uses the getBinaryStreamFor function to get a binary stream 
+#      representation of two numbers (7 and 5 by default). The 
+#      resulting stream is sent to the BinaryCounter process.  
+# - The output of the BinaryCounter process is sent to the toDecimal
+#      process which converts the output binary stream into a decimal 
+#      representation.
 define program :: c : Channel<-int> = {
-    var addStream := exec BinaryCounter;
-    addStream.send(exec Num7);
-    addStream.send(exec Num5);
+  var addStream := exec BinaryCounter, printer := exec toDecimal;
+  addStream.send(getBinaryStreamFor(7));
+  addStream.send(getBinaryStreamFor(5));
 
-    accept(addStream) {
-        printf("%s",(boolean b) : str {
-            if b { return "1"; }
-            return "0";
-        }(addStream.recv()));
-    }
-    printf("\n");
-
-    c.send(0); 
+  printer.send(addStream);
+  c.send(0); 
 }
 
-define func XOR (boolean a, boolean b) : boolean {
-    return (a & !b) | (!a & b);
-}
+# Receives two Channel<!+boolean> which each represent a stream of bits in 
+# a binary number. We read both streams bit-by-bit and output the result 
+# of adding them together. 
 define BinaryCounter :: c : Channel<+Channel<!+boolean>; +Channel<!+boolean>;?-boolean> = {
+    # Defines the local variables for each of the channels  
     var i1 := c.recv(), i2 := c.recv();
 
+    # Tracks the remainder we have to carry to the next bit
     boolean carry := false; 
-    boolean shouldLoop := true; 
-    while shouldLoop {
-        boolean looped1 := false; 
-        boolean val1 := false; 
-        acceptWhile(i1, !looped1) {val1 := i1.recv(); looped1 := true;}
+    accept(i1) {
+        # Receive a boolean on i1, 
+        boolean val := i1.recv(); 
 
+        # Attempt to receive a single boolean on i2 (which could end before i1)
         boolean looped2, val2 := false; 
         acceptWhile(i2, !looped2) {val2 := i2.recv(); looped2 := true;}
 
-        shouldLoop := looped1 & looped2; 
-        boolean xor := XOR(val1, val2); 
+        # Implements a full-adder to calculate the resulting sum and carry
+        boolean xor := XOR(val, val2); 
         boolean sum := XOR(xor, carry); 
-        boolean car := (xor & carry) | (val1 & val2);
+        carry := (xor & carry) | (val & val2);
+        
+        # Unfold one iteration of our output loop and send the sum over it
         more(c);
         c.send(sum);
-        carry := car;  
     }
-    # Only one or the other of the accepts will end up running
-    accept(i1) {
-        boolean val := i1.recv(); 
-        more(c); 
-        c.send(XOR(val, carry));
-        carry := val & carry; 
-    }
+
+    # As it is possible that i1 ends before i2, we have to 
+    # repeat the above process; however, only with i1. 
     accept(i2) {
         boolean val := i2.recv(); 
         more(c); 
         c.send(XOR(val, carry));
         carry := val & carry; 
     }
+
+    # After both channels have ended, it is possible that we have 
+    # one last bit to output. 
     if carry {
         more(c); 
         c.send(carry);
@@ -422,22 +437,42 @@ define BinaryCounter :: c : Channel<+Channel<!+boolean>; +Channel<!+boolean>;?-b
     weaken(c);  
 }
 
-define Num7 :: c : Channel<?-boolean> = {
-    more(c); 
-    c.send(true); 
-    more(c); 
-    c.send(true); 
-    more(c)
-    c.send(true); 
-    weaken(c); 
+define func XOR (boolean a, boolean b) : boolean {
+    return (a & !b) | (!a & b);
 }
 
-define Num5 :: c : Channel<?-boolean> = {
-    more(c); 
-    c.send(true); 
-    more(c); 
-    c.send(false); 
-    more(c)
-    c.send(true); 
-    weaken(c); 
+define func getBinaryStreamFor(int n) : Channel<!+boolean> {
+    var c := exec toBinary; 
+    c.send(n); 
+    return c; 
+}
+
+define toBinary :: c : Channel<+int;?-boolean> = {
+    int n := c.recv(); 
+
+    while n > 0 {
+        more(c)
+        if n % 2 == 1 {
+            c.send(true);
+        } else {
+            c.send(false);
+        }
+        n := n / 2; 
+    }
+
+    weaken(c);
+}
+
+define toDecimal :: c : Channel<+Channel<!+boolean>> = {
+    var a := c.recv(), dec_val := 0, base := 1; 
+ 
+    accept(a) { 
+        if a.recv() {
+            dec_val := dec_val + base; 
+        }
+ 
+        base := base * 2;
+    }
+ 
+    printf("%u\n", dec_val);
 }`

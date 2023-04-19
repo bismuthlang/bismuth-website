@@ -39,7 +39,7 @@ hljs.registerLanguage("tbd", (hljs) => ({
   name: "Tbd",
   aliases: ["tbd", "TBD"],
   keywords: {
-    keyword: "if while else func define extern match offer return select exit struct enum accept acceptWhile more weaken",
+    keyword: "if while else func define extern match offer return select exit struct enum accept acceptWhile more weaken unfold",
     type: "int boolean str var Channel Program InternalChoice ExternalChoice"
   },
   contains: [
