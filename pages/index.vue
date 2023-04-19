@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isAvailable">
+  <div>
     <div class="h-screen" id="home">
       <div class="flex items-center justify-center h-full">
         <div class="text-center font-mono max-w-[350px]">
@@ -9,7 +9,7 @@
         </div>
       </div>
     </div>
-    <div id="resources" class="bg-slate-100 w-screen py-4 flex items-center font-mono flex-col">
+    <div id="resources" class="bg-slate-100 w-full py-4 flex items-center font-mono flex-col">
       <h2 class="text-2xl font-bold my-4">Paper & Other Resources</h2>
       <div class="grid grid-template gap-4">
         <a href="/ahf-mqp-pw-poster.pdf">
@@ -31,15 +31,6 @@
     </div>
     <Editor id="editor" />
   </div>
-  <div v-else class="h-screen">
-    <div class="flex items-center justify-center h-full">
-      <div class="text-center font-mono max-w-[350px]">
-        <h1 class="text-2xl font-bold my-4">Bismuth is a programming language designed for distributed, concurrent, and
-          mobile tasks.</h1>
-        <p>More information on April 21st 2023</p>
-      </div>
-    </div>
-  </div>
 </template>
 
 <script>
@@ -58,23 +49,23 @@ export default defineNuxtComponent({
       title: 'Bismuth Programming Language',
     }
   },
-  async asyncData() {
-    const event = useRequestEvent()
-    const req = event.req
-    const headers = (req && req.headers) ? Object.assign({}, req.headers) : {}
-    const cfConnectingIp = headers['cf-connecting-ip'];
-    const xForwardedFor = headers['x-forwarded-for']
-    const xRealIp = headers['x-real-ip']
-    // console.log(xForwardedFor)
-    // console.log(xRealIp)
+  // async asyncData() {
+  //   const event = useRequestEvent()
+  //   const req = event.req
+  //   const headers = (req && req.headers) ? Object.assign({}, req.headers) : {}
+  //   const cfConnectingIp = headers['cf-connecting-ip'];
+  //   const xForwardedFor = headers['x-forwarded-for']
+  //   const xRealIp = headers['x-real-ip']
+  //   // console.log(xForwardedFor)
+  //   // console.log(xRealIp)
 
-    const ip = cfConnectingIp || xForwardedFor || xRealIp || "";
-    const ans  = new Date().getTime() / 1000 >= 1682049600 || ip.toString() === "::ffff:127.0.0.1" || ip.toString().startsWith("130.215.") || ip.toString() === "75.143.39.252" || ip.toString() === "2600:6c64:617f:7885:7da8:6d9f:2734:f8c7";
-    // console.log('IP ', ip, ans, headers)
-    return {
-      isAvailable: ans
-    }
-  }
+  //   const ip = cfConnectingIp || xForwardedFor || xRealIp || "";
+  //   const ans  = new Date().getTime() / 1000 >= 1682049600 || ip.toString() === "::ffff:127.0.0.1" || ip.toString().startsWith("130.215.") || ip.toString() === "75.143.39.252" || ip.toString() === "2600:6c64:617f:7885:7da8:6d9f:2734:f8c7";
+  //   // console.log('IP ', ip, ans, headers)
+  //   return {
+  //     isAvailable: true
+  //   }
+  // }
 })
 </script>
 
