@@ -10,15 +10,17 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-const hwCode = `extern int func printf(str s, ...); # Import printf
+const hwCode = `extern func printf(str s, ...) : int; # Import printf
 
 # Define the main program in the system. 
-define program :: c : Channel<-int> = {
+# - c is the name of the channel used by the program 
+# - -int indicates that we have to send an int over the channel.
+define program :: c : Channel<-int> {
   printf("Hello, World!\\n");
   c.send(0)
 }`
 
-const btCode = `extern int func printf(str s, ...);
+const btCode = `extern func printf(str s, ...) : int;
 
 # Defines a struct that holds no value; used to simulate optionals
 define struct Empty {}
@@ -79,7 +81,7 @@ define func printSpaces(int chars) {
 define func printBT(BinaryTree node) 
 {
   printf("%u", node.value);
-  printf("\\n");
+  printf("\n");
 
 
   match node.lhs {
@@ -92,7 +94,7 @@ define func printBT(BinaryTree node)
     Box<BinaryTree> n => traversePreOrder(0, "└──", *n);
   }
 
-  printf("\\n");
+  printf("\n");
   return; 
 }
 
@@ -100,7 +102,7 @@ define func traversePreOrder(int padding, str prefix, BinaryTree node) {
   printSpaces(padding);
   printf(prefix);
   printf("%u", node.value);
-  printf("\\n");
+  printf("\n");
 
   match node.lhs {
     Empty e => {}
@@ -135,7 +137,7 @@ define program :: c : Channel<-int> = {
   c.send(0)
 }`
 
-const dbCode = `extern int func printf(str s, ...);
+const dbCode = `extern func printf(str s, ...) : int;
 
 define struct Empty {}
 define struct Value {int v;}
@@ -210,7 +212,7 @@ define program :: c : Channel<-int> = {
     # Process each of the requests with high-priority requests taking precedence
     accept(rqs) { 
 
-      acceptWhile(setRq, true) {
+      acceptWhile(setRq, setRq.is_present()) {
         more(db); 
         db[-int;-Value]
         db.send(setRq.recv())
@@ -292,7 +294,7 @@ define writeRequest :: c : Channel<?(-int;-Value)> = {
     weaken(c)
 }`
 
-const fibCode = `extern int func printf(str s,...);
+const fibCode = `extern func printf(str s,...) : int;
 
 define fib :: c : Channel<+int;-int> = {
   int n := c.recv(); 
@@ -325,7 +327,7 @@ define program :: c : Channel<-int> = {
   c.send(-1)
 }`
 
-const isPrime = `extern int func printf(str s,...);
+const isPrime = `extern func printf(str s,...) : int;
 
 # Function version of isPrime
 define func isPrimeFunc(int n) : boolean {
@@ -372,7 +374,7 @@ define program :: c : Channel<-int> = {
   c.send(nPrimes)
 }`
 
-const adderCode = `extern int func printf(str s, ...);
+const adderCode = `extern func printf(str s, ...) : int;
 
 # Main program 
 # - Spawns a BinaryCounter and toDecimal process
@@ -405,8 +407,8 @@ define BinaryCounter :: c : Channel<+Channel<!+boolean>; +Channel<!+boolean>;?-b
         boolean val := i1.recv(); 
 
         # Attempt to receive a single boolean on i2 (which could end before i1)
-        boolean looped2, val2 := false; 
-        acceptWhile(i2, !looped2) {val2 := i2.recv(); looped2 := true;}
+        boolean val2 := false; 
+        acceptIf(i2, true) { val2 := i2.recv();}
 
         # Implements a full-adder to calculate the resulting sum and carry
         boolean xor := XOR(val, val2); 
