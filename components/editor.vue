@@ -76,14 +76,14 @@ export default {
   },
   data: () => ({
     code: '',
-    terminalText: ">",
+    terminalText: "Bismuth Pre-Alpha v1.3.4\n>",
     isLoading: false, 
   }),
   methods: {
 
     compile: async function () {
       this.isLoading = true;       
-      this.terminalText = ">"
+      this.terminalText = "Bismuth Pre-Alpha v1.3.4\n>"
       // const { data: resData } = await useFetch('/api/compile')
       const { data: resData } = await useFetch('/api/compile', { method: 'post', body: { code: this.code } })
       this.terminalText = resData._rawValue.data;

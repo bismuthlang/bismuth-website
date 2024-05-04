@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
         try {
             let compileData = await promisifyStream(stream)
             if (compileData.toString().length > 0) {
-                myResolve(compileData.toString());
+                myResolve(compileData.toString().replaceAll("/home/my-service/Sandbox/input.txt", "main.bismuth"));
             }
             else {
                 let runStream = await (await _container.exec.create({
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
 
                 let runData = await promisifyStream(runStream);
 
-                myResolve("Compiled Successfully. Output: \n" + runData.toString()); 
+                myResolve("Compiled Successfully. Output!: \n" + runData.toString()); 
             }
 
         } catch (err) {

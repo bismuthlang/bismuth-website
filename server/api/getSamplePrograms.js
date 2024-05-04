@@ -81,7 +81,7 @@ define func printSpaces(int chars) {
 define func printBT(BinaryTree node) 
 {
   printf("%u", node.value);
-  printf("\n");
+  printf("\\n");
 
 
   match node.lhs {
@@ -139,9 +139,8 @@ define program :: c : Channel<-int> = {
 
 const dbCode = `extern func printf(str s, ...) : int;
 
-define struct Empty {}
 define struct Value {int v;}
-define enum OptVal {Empty, Value}
+define enum OptVal {Unit, Value}
 
 # The Database program serves an external choice of 
 # either: 
@@ -155,27 +154,20 @@ define enum OptVal {Empty, Value}
 #      the process then receives a new Value to store correlating to this key.  
 define Database :: c : Channel<
                         !ExternalChoice<
-                              +int;-OptVal,
-                              +int;+Value,
-                              +int;InternalChoice<
-                                       -Value;+Value,
-                                       +Value>>> = {
+                              get: +int;-OptVal,
+                              set: +int;+Value,
+                              lock: +int;InternalChoice<
+                                       present: -Value;+Value,
+                                       missing: +Value>>> = {
 
   Value[10] data; 
 
-  # Helper function to look up a value in the database. 
-  define func Lookup(Value[10] d, int k) : OptVal {
-     if k < 0 | k >= 10 { return Empty::init(); }
-     return d[k]; 
-  }
-
-  # Helper function to log the contents of teh database
+  # Helper function to log the contents of the database
   define func PrintDatabase(Value[10] data) {
-      var i := 0; 
-      while i < data.length {
-        var v := data[i]; 
-        printf("%u, ", v.v);
-        i := i + 1; 
+      for(int i := 0; i < data.length; i := i + 1) {
+        match data[i]
+          | Value v => printf("%u, ", v.v);
+          | Unit u => printf("*, ");
       }
       printf("\\n");
       return;
@@ -186,16 +178,15 @@ define Database :: c : Channel<
 
   accept(c) {
     offer c 
-      | +int;-OptVal => { 
-            c.send(Lookup(data, c.recv()))
+      | get => { 
+          c.send(data[c.recv()]);
         }
-      | +int;+Value => {
-            var key := c.recv(); 
-            data[key] := c.recv(); 
+      | set => {
+            data[c.recv()] := c.recv();
         }
-      | +int;InternalChoice<-Value;+Value,+Value> => {
+      | lock => {
           var k := c.recv();
-          c[+Value]
+          c[missing]
           data[k] := c.recv();
         }
     printf("Database Updated: \\n");
@@ -204,36 +195,44 @@ define Database :: c : Channel<
 }
 
 define program :: c : Channel<-int> = {
-    var db := exec Database;  # Database to send requests to
-    var rqs := exec requests; # Regular priority requests
+    var db := exec Database;
+    var rqs := exec requests;
+    var setRq := exec writeRequest; 
 
-    var setRq := exec writeRequest; # High-priority requests
 
-    # Process each of the requests with high-priority requests taking precedence
-    accept(rqs) { 
-
-      acceptWhile(setRq, setRq.is_present()) {
+    accept(rqs) {
+      # Process each of the requests with high-priority requests taking precedence
+      acceptIf(setRq, setRq.is_present()) {
+        printf("AcceptIf Present!\\n");
         more(db); 
-        db[-int;-Value]
+        db[set]
         db.send(setRq.recv())
         db.send(setRq.recv())
+      }
+      else 
+      {
+        printf("AcceptIf Not Present!\\n");
       }
    
       more(db)
       offer rqs 
         | +int;-OptVal => { 
-            db[-int;+OptVal] 
+            db[get] 
             db.send(rqs.recv())  
             var a := db.recv();
             rqs.send(a) 
           } 
-        | +int;+Value => { db[-int;-Value] db.send(rqs.recv()) db.send(rqs.recv()) }
+        | +int;+Value => { 
+            db[set] 
+            db.send(rqs.recv()) 
+            db.send(rqs.recv()) 
+          }
         | +int;InternalChoice<-Value;+Value, +Value> => { 
-            db[-int;ExternalChoice<+Value;-Value, -Value>] 
+            db[lock] 
             db.send(rqs.recv())
             offer db 
-                |   +Value;-Value => { rqs[-Value;+Value] rqs.send(db.recv()) db.send(rqs.recv())}
-                |   -Value => { rqs[+Value] db.send(rqs.recv()) }
+                | present => { rqs[-Value;+Value] rqs.send(db.recv()) db.send(rqs.recv())}
+                | missing => { rqs[+Value] db.send(rqs.recv()) }
           }
   
     }
@@ -241,7 +240,7 @@ define program :: c : Channel<-int> = {
 
     accept(setRq) {
       more(db); 
-      db[-int;-Value]
+      db[set]
       db.send(setRq.recv())
       db.send(setRq.recv())
     }
@@ -268,7 +267,7 @@ define requests :: c : Channel<
     printf("Read Request for 4 got: ");
 
     match opt
-      | Empty e => { printf("empty\\n"); }
+      | Unit e => { printf("empty\\n"); }
       | Value v => { printf("%u\\n", v.v); }
 
     more(c)
@@ -279,14 +278,13 @@ define requests :: c : Channel<
     printf("Read Request for 20 got: ");
 
     match opt
-      | Empty e => { printf("empty\\n"); }
+      | Unit e => { printf("empty\\n"); }
       | Value v => { printf("%u\\n", v.v); }
 
     weaken(c)
 }
 
 define writeRequest :: c : Channel<?(-int;-Value)> = {
-    
     more(c)
     c.send(4)
     c.send(Value::init(2))
@@ -299,7 +297,7 @@ const fibCode = `extern func printf(str s,...) : int;
 define fib :: c : Channel<+int;-int> = {
   int n := c.recv(); 
 
-  if(n == 0 | n == 1) {
+  if(n == 0 || n == 1) {
     c.send(n) exit
   }
 
@@ -344,7 +342,7 @@ define isPrimeProg :: c : Channel<+int;-boolean> = {
   int n := c.recv();
   var i := 3, done := false, ans := true;
 
-  while (!done & i < n) { 
+  while (!done && i < n) { 
     if (n / i * i == n) { 
       done := true; 
       ans := false; 
@@ -413,7 +411,7 @@ define BinaryCounter :: c : Channel<+Channel<!+boolean>; +Channel<!+boolean>;?-b
         # Implements a full-adder to calculate the resulting sum and carry
         boolean xor := XOR(val, val2); 
         boolean sum := XOR(xor, carry); 
-        carry := (xor & carry) | (val & val2);
+        carry := (xor && carry) || (val && val2);
         
         # Unfold one iteration of our output loop and send the sum over it
         more(c);
@@ -426,7 +424,7 @@ define BinaryCounter :: c : Channel<+Channel<!+boolean>; +Channel<!+boolean>;?-b
         boolean val := i2.recv(); 
         more(c); 
         c.send(XOR(val, carry));
-        carry := val & carry; 
+        carry := val && carry; 
     }
 
     # After both channels have ended, it is possible that we have 
@@ -440,7 +438,7 @@ define BinaryCounter :: c : Channel<+Channel<!+boolean>; +Channel<!+boolean>;?-b
 }
 
 define func XOR (boolean a, boolean b) : boolean {
-    return (a & !b) | (!a & b);
+    return (a && !b) || (!a && b);
 }
 
 define func getBinaryStreamFor(int n) : Channel<!+boolean> {
@@ -476,5 +474,5 @@ define toDecimal :: c : Channel<+Channel<!+boolean>> = {
         base := base * 2;
     }
  
-    printf("%u\n", dec_val);
+    printf("%u\\n", dec_val);
 }`

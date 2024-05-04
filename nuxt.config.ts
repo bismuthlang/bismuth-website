@@ -4,7 +4,12 @@ export default defineNuxtConfig({
     app: {
         head: {
             link: [
-                { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' }]
+                { rel: 'icon', type: 'image/x-icon', href: '/logo2.png' }]
+        }
+    },
+    routeRules: {
+        '/api/compile': {
+            cors: true
         }
     }
     // app: {

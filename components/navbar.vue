@@ -4,6 +4,7 @@
             <NuxtLink to="https://ahfriedman.com/about" class="px-5 underline">Contact</NuxtLink>
             <NuxtLink to="/#resources" class="px-5 underline">Papers</NuxtLink>
             <NuxtLink to="/#editor" class="px-5 underline">Editor</NuxtLink>
+            <NuxtLink to="https://docs.bismuth-lang.org/" class="px-5 underline">Docs</NuxtLink>
             <!-- {{ $route.fullPath }} -->
         </nav>
     </header>
