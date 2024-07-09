@@ -1,11 +1,16 @@
 <template>
     <header class="font-mono">
-        <nav class="z-50 shadow bg-white fixed top-0 left-0 w-screen leading-[56px] flex flex-row justify-center">
-            <NuxtLink to="https://ahfriedman.com/about" class="px-5 underline">Contact</NuxtLink>
-            <NuxtLink to="/#resources" class="px-5 underline">Papers</NuxtLink>
-            <NuxtLink to="/#editor" class="px-5 underline">Editor</NuxtLink>
-            <NuxtLink to="https://docs.bismuth-lang.org/" class="px-5 underline">Docs</NuxtLink>
-            <!-- {{ $route.fullPath }} -->
+        <nav class="z-50 shadow bg-white fixed top-0 left-0 w-screen leading-[56px] flex flex-row">
+            <div class="mr-auto hidden md:flex">
+                <img src="/logo2.svg" class="max-h-14 p-1.5">
+            </div>
+            <div class="max-md:m-auto md:mr-auto">
+                <NuxtLink to="https://ahfriedman.com/about" class="px-5 underline hidden md:inline">Contact</NuxtLink>
+                <NuxtLink to="https://docs.bismuth-lang.org/" class="px-5 underline">Docs</NuxtLink>
+                <NuxtLink to="/#editor" class="px-5 underline">Editor</NuxtLink>
+                <NuxtLink to="/#resources" class="px-5 underline">Papers</NuxtLink>
+                <!-- {{ $route.fullPath }} -->
+            </div>
         </nav>
     </header>
 </template>

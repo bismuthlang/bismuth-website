@@ -9,7 +9,7 @@ const { data: Programs } = await useFetch('/api/getSamplePrograms', { method: 'g
         <div class="flex flex-col col-span-2 lg:col-span-1 m-6 lg:m-0">
           <span class="flex">
             <button disabled v-if="isLoading" class="run_btn mb-2 p-2 flex" v-on:click="compile">Run  <Spinner class="ml-2"/> </button>
-            <button v-else class="run_btn mb-2 p-2" v-on:click="compile">Run -> </button>
+            <button v-else class="run_btn mb-2 p-2" v-on:click="compile">Run &#11208; </button>
             
             <select v-on:change="$event => selectChange(Programs[$event.target.value])" :disabled="isLoading" name="Program" class="program_select mx-4 mb-2 p-2">
               <option hidden disabled selected value> Load Sample Program </option>
@@ -76,14 +76,14 @@ export default {
   },
   data: () => ({
     code: '',
-    terminalText: "Bismuth Pre-Alpha v1.3.4\n>",
+    terminalText: "Bismuth Pre-Alpha v1.3.4\n$ ",
     isLoading: false, 
   }),
   methods: {
 
     compile: async function () {
       this.isLoading = true;       
-      this.terminalText = "Bismuth Pre-Alpha v1.3.4\n>"
+      this.terminalText = "Bismuth Pre-Alpha v1.3.4\n$ "
       // const { data: resData } = await useFetch('/api/compile')
       const { data: resData } = await useFetch('/api/compile', { method: 'post', body: { code: this.code } })
       this.terminalText = resData._rawValue.data;
@@ -127,7 +127,7 @@ export default {
   /* we don't use `language-` classes anymore so thats why we need to add background and text color manually */
   /* background: #2d2d2d; */
   /* background-color: transparent !important; */
-  color: #3b3535;
+  color: #3b3535fa;
 
   font-variant-ligatures: none;
 
@@ -160,9 +160,10 @@ export default {
 .terminal {
   font-size: 15px; 
   font-family: Consolas, Monaco, monospace;
-  color: whitesmoke;
+  font-weight: bold;
+  color: aliceblue;
 
-  background: rgba(25, 23, 23, 0.7);
+  background: rgba(25, 23, 23, 0.95);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -173,7 +174,7 @@ export default {
 .run_btn {
   font-family: Fira code, Fira Mono, Consolas, monospace;
 
-  background: rgba(117, 197, 27, 0.6);
+  background: #2ca4ac80;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -182,13 +183,13 @@ export default {
 }
 
 .run_btn:disabled {
-  background: rgba(118, 197, 27, 0.281);
+  background: #2ca4ac40;
 }
 
 .program_select {
   font-family: Fira code, Fira Mono, Consolas, monospace;
 
-  background: rgba(87, 90, 85, 0.6);
+  background: #c179ff80;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -197,7 +198,7 @@ export default {
 }
 
 .program_select:disabled {
-  background: rgba(87, 90, 85, 0.308);
+  background: #c179ff40;
 }
 
 .gradient {

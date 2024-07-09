@@ -1,16 +1,31 @@
 <template>
   <div>
-    <div class="h-screen" id="home">
-      <div class="flex items-center justify-center h-full">
-        <div class="text-center font-mono max-w-[350px]">
-          <h1 class="text-2xl font-bold my-4">Bismuth is a programming language designed for distributed, concurrent, and
-            mobile tasks.</h1>
-          <p class="text-7xl text-slate-400 font-serif animate-pulse">⇓</p>
+    <div class="mt-44 mb-40" id="home">
+      <div class="flex items-center justify-center h-full flex-col">
+        <div class="flex items-center font-bold text-center font-mono flex-col md:flex-row">
+          <h1 class="fancy-text md:mr-4 text-5xl">Bismuth</h1>
+          <h1 class="max-w-[400px] md:pl-4 text-2xl md:border-l-2">A session-typed programming language designed to make it easier to write safe distributed & concurrent programs.</h1>
+          <!-- <h1 class="max-w-[400px] pl-4 text-2xl border-l-2">A programming language designed for distributed & concurrent systems while remaining user-friendly and providing correctness guarantees.</h1> -->
         </div>
+
+        <!-- <div class="mt-16">
+
+            <div class="border-2 card-term">
+              <div class="w-full text-center p-1 border-b-2 font-mono font-bold">
+                Session Types
+              </div>
+              <div class="p-2 font-mono">
+                hey there so this is some stuff
+              </div>
+            </div>
+
+        </div> -->
+
+
       </div>
     </div>
     <div id="resources" class="bg-slate-100 w-full py-4 flex items-center font-mono flex-col">
-      <h2 class="text-2xl font-bold my-4">Paper & Other Resources</h2>
+      <h2 class="text-2xl font-bold my-4">Papers & Other Resources</h2>
       <div class="grid grid-template gap-4">
         <a href="/ahf-mqp-pw-poster.pdf">
           <div class="glass card">
@@ -103,5 +118,25 @@ export default defineNuxtComponent({
 }
 
 
+.fancy-text {
+  background:   repeating-linear-gradient(135deg, #c179ff,#9a60cc, #2ca4ac, #39d6d5);
+  background-clip: text;
+  color: transparent;
+}
+
+.card-1 {
+  border-radius: 50px;
+background: #F1F5F9;
+box-shadow:  -20px 20px 60px #cdd0d4,
+             20px -20px 60px #ffffff;
+
+             padding-top: 100%
+}
+
+.card-term {
+  height: 350px;
+  border-radius: 15px;
+  aspect-ratio: 1/1;
+}
 </style>
   
