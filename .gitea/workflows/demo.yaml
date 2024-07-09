@@ -9,6 +9,13 @@ jobs:
       - run: echo "🎉 The job was automatically triggered by a ${{ gitea.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by Gitea!"
       - run: echo "🔎 The name of your branch is ${{ gitea.ref }} and your repository is ${{ gitea.repository }}."
+      - name: Git Setup
+      run: |
+        mkdir -p ~/.ssh
+        echo 'Host ${{ vars.HOST_NAME }} ' >> ~/.ssh/config
+        echo '    HostName ${{ vars.HOST_NAME }}' >> ~/.ssh/config
+        echo '    Port ${{ vars.HOST_PORT }}' >> ~/.ssh/config
+        cat  ~/.ssh/config
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
