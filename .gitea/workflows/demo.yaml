@@ -22,7 +22,7 @@ jobs:
           repository: ahf/bismuth-website
           ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
           ssh-known-hosts: ${{ vars.KNOWN_HOSTS }}
-           ssh-strict: 'false'
+          ssh-strict: 'false'
           github-server-url: ${{ vars.SERVER_ADDR }}
       - run: echo "💡 The ${{ gitea.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
