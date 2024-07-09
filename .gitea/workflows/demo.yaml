@@ -16,6 +16,8 @@ jobs:
           echo '    HostName ${{ vars.HOST_NAME }}' >> ~/.ssh/config
           echo '    Port ${{ vars.HOST_PORT }}' >> ~/.ssh/config
           cat  ~/.ssh/config
+          ssh-keyscan -H 192.168.1.162 >> ~/.ssh/known_hosts
+          cat ~/.ssh/known_hosts
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
