@@ -14,6 +14,7 @@ jobs:
           echo 'Thank you https://github.com/actions/checkout/issues/1315!'
           mkdir -p ~/.ssh
           echo 'Host ${{ vars.HOST_NAME }} ' >> ~/.ssh/config
+          echo '    StrictHostKeyChecking no' >> ~/.ssh/config
           echo '    HostName ${{ vars.HOST_NAME }}' >> ~/.ssh/config
           echo '    Port ${{ vars.HOST_PORT }}' >> ~/.ssh/config
           cat  ~/.ssh/config
