@@ -11,6 +11,7 @@ jobs:
       - run: echo "🔎 The name of your branch is ${{ gitea.ref }} and your repository is ${{ gitea.repository }}."
       - name: Git Setup
         run: |
+          echo 'Thank you https://github.com/actions/checkout/issues/1315!'
           mkdir -p ~/.ssh
           echo 'Host ${{ vars.HOST_NAME }} ' >> ~/.ssh/config
           echo '    HostName ${{ vars.HOST_NAME }}' >> ~/.ssh/config
@@ -22,7 +23,7 @@ jobs:
           repository: ahf/bismuth-website
           ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
           ssh-known-hosts: ${{ vars.KNOWN_HOSTS }}
-          ssh-strict: 'false'
+          ssh-strict: false
           github-server-url: ${{ vars.SERVER_ADDR }}
       - run: echo "💡 The ${{ gitea.repository }} repository has been cloned to the runner."
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
