@@ -9,14 +9,14 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.4.1",
-    "nuxt": "^3.2.2",
+    "nuxt": "^3.12.4",
     "sass": "^1.58.3"
   },
   "dependencies": {
-    "highlight.js": "^11.7.0",
+    "highlight.js": "11.8.0",
     "node-docker-api": "^1.1.22",
     "prismjs": "^1.29.0",
-    "simple-code-editor": "^1.2.2",
+    "simple-code-editor": "git+https://github.com/ahfriedman/simple-code-editor.git",
     "tar-stream": "^3.0.0",
     "vue-prism-editor": "^2.0.0-alpha.2"
   }
