@@ -5,7 +5,7 @@
                 <img src="/logo2.svg" class="max-h-14 p-1.5">
             </div>
             <div class="max-md:m-auto md:mr-auto">
-                <NuxtLink to="https://ahfriedman.com/about" class="px-5 underline hidden md:inline">Contact</NuxtLink>
+                <NuxtLink to="https://github.com/bismuthlang" class="px-5 underline hidden md:inline">Source</NuxtLink>
                 <NuxtLink to="https://docs.bismuth-lang.org/" class="px-5 underline">Docs</NuxtLink>
                 <NuxtLink to="/#editor" class="px-5 underline">Editor</NuxtLink>
                 <NuxtLink to="/#resources" class="px-5 underline">Papers</NuxtLink>
