@@ -39,8 +39,8 @@ hljs.registerLanguage("tbd", (hljs) => ({
   name: "Tbd",
   aliases: ["tbd", "TBD"],
   keywords: {
-    keyword: "if while else func define extern match offer return select exit struct enum accept acceptWhile more weaken unfold acceptIf",
-    type: "int boolean str var Channel Program InternalChoice ExternalChoice"
+    keyword: "if while else func prog extern match offer return select exit struct enum accept acceptWhile more weaken unfold acceptIf for",
+    type: "int u32 i32 u64 i64 boolean str var Channel Program InternalChoice ExternalChoice"
   },
   contains: [
     {
@@ -76,14 +76,14 @@ export default {
   },
   data: () => ({
     code: '',
-    terminalText: "Bismuth Pre-Alpha v1.3.4\n$ ",
+    terminalText: "Bismuth Pre-Alpha v1.3.7\n$ ",
     isLoading: false, 
   }),
   methods: {
 
     compile: async function () {
       this.isLoading = true;       
-      this.terminalText = "Bismuth Pre-Alpha v1.3.4\n$ "
+      this.terminalText = "Bismuth Pre-Alpha v1.3.7\n$ "
       // const { data: resData } = await useFetch('/api/compile')
       const { data: resData } = await useFetch('/api/compile', { method: 'post', body: { code: this.code } })
       this.terminalText = resData._rawValue.data;

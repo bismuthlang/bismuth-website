@@ -10,20 +10,20 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-const hwCode = `extern func printf(str s, ...) : int; # Import printf
+const hwCode = `extern func printf(str s, ...) -> int; # Import printf
 
 # Define the main program in the system. 
 # - c is the name of the channel used by the program 
 # - -int indicates that we have to send an int over the channel.
-define program :: c : Channel<-int> {
+prog main :: c : -int {
   printf("Hello, World!\\n");
   c.send(0)
 }`
 
-const btCode = `extern func printf(str s, ...) : int;
+const btCode = `extern func printf(str s, ...) -> int;
 
 # Defines a struct that holds no value; used to simulate optionals
-define struct Empty {}
+struct Empty {}
 
 /* 
  * Defines a struct for each binary tree node
@@ -32,7 +32,7 @@ define struct Empty {}
  *  - lhs, an anonymous enum that is either empty, or a pointer to a binary tree node
  *  - rhs, an anonymous enum that is either empty, or a pointer to a binary tree node
  */
-define struct BinaryTree {
+struct BinaryTree {
   int value; 
   (Empty + Box<BinaryTree>) lhs;  
   (Empty + Box<BinaryTree>) rhs; 
@@ -46,7 +46,7 @@ define struct BinaryTree {
  * Returns: 
  *  - Unit/Nothing, as functions are synchronous and pass-by-reference, the parameter root will reflect the changes made. 
  */
-define func insertBT(Box<BinaryTree> root, int value) {
+func insertBT(Box<BinaryTree> root, int value) {
   BinaryTree bt := *root; # Get a pointer to the binary tree
   if bt.value < value {   # Check which side of the tree to insert into
     match bt.lhs {        # If the branch is empty, set it to be a new binary tree. Otherwise, recursively call insert. 
@@ -68,7 +68,7 @@ define func insertBT(Box<BinaryTree> root, int value) {
 }
 
 # Helper function to print a number of spaces to the current line
-define func printSpaces(int chars) {
+func printSpaces(int chars) {
   int i := 0; 
   while i < chars {
     printf(" ");
@@ -78,7 +78,7 @@ define func printSpaces(int chars) {
 }
 
 # Function to print a binary tree node. 
-define func printBT(BinaryTree node) 
+func printBT(BinaryTree node) 
 {
   printf("%u", node.value);
   printf("\\n");
@@ -98,7 +98,7 @@ define func printBT(BinaryTree node)
   return; 
 }
 
-define func traversePreOrder(int padding, str prefix, BinaryTree node) {
+func traversePreOrder(int padding, str prefix, BinaryTree node) {
   printSpaces(padding);
   printf(prefix);
   printf("%u", node.value);
@@ -117,7 +117,7 @@ define func traversePreOrder(int padding, str prefix, BinaryTree node) {
   return;
 }
 
-define program :: c : Channel<-int> = {
+prog main :: c : -int {
   Box<BinaryTree> node := Box<BinaryTree>::init(BinaryTree::init(5, Empty::init(), Empty::init()));
   printBT( *node);
   insertBT(node, 6);
@@ -137,10 +137,10 @@ define program :: c : Channel<-int> = {
   c.send(0)
 }`
 
-const dbCode = `extern func printf(str s, ...) : int;
+const dbCode = `extern func printf(str s, ...) -> int;
 
-define struct Value {int v;}
-define enum OptVal {Unit, Value}
+struct Value {int v;}
+enum OptVal {Unit, Value}
 
 # The Database program serves an external choice of 
 # either: 
@@ -152,19 +152,29 @@ define enum OptVal {Unit, Value}
 #   3. Receiving an integer key to lookup. If this key is in the database, 
 #      then the current Value corresponding to the key is returned. Either way, 
 #      the process then receives a new Value to store correlating to this key.  
-define Database :: c : Channel<
-                        !ExternalChoice<
-                              get: +int;-OptVal,
-                              set: +int;+Value,
-                              lock: +int;InternalChoice<
-                                       present: -Value;+Value,
-                                       missing: +Value>>> = {
+prog Database :: c : !ExternalChoice<
+                          get: +int;-OptVal,
+                          set: +int;+Value,
+                          lock: +int;InternalChoice<
+                                    present: -Value;+Value,
+                                    missing: +Value>> = {
 
-  Value[10] data; 
+  Value[10] data := [
+    Value::init(10),
+    Value::init(20),
+    Value::init(30),
+    Value::init(40),
+    Value::init(50),
+    Value::init(60),
+    Value::init(70),
+    Value::init(80),
+    Value::init(90),
+    Value::init(100)
+  ];
 
   # Helper function to log the contents of the database
-  define func PrintDatabase(Value[10] data) {
-      for(int i := 0; i < data.length; i := i + 1) {
+  func PrintDatabase(Value[10] data) {
+      for(var i := 0; i < data.length; i := i + 1) {
         match data[i]
           | Value v => printf("%u, ", v.v);
           | Unit u => printf("*, ");
@@ -194,7 +204,7 @@ define Database :: c : Channel<
   }
 }
 
-define program :: c : Channel<-int> = {
+prog main :: c : -int {
     var db := exec Database;
     var rqs := exec requests;
     var setRq := exec writeRequest; 
@@ -250,13 +260,12 @@ define program :: c : Channel<-int> = {
 }
 
 
-define requests :: c : Channel<
-                        ?InternalChoice<
-                              -int;+OptVal,
-                              -int;-Value,
-                              -int;ExternalChoice<
-                                       +Value;-Value,
-                                       -Value>>> = {
+prog requests :: c : ?InternalChoice<
+                      -int;+OptVal,
+                      -int;-Value,
+                      -int;ExternalChoice<
+                                +Value;-Value,
+                                -Value>> {
 
     
     more(c)
@@ -284,7 +293,7 @@ define requests :: c : Channel<
     weaken(c)
 }
 
-define writeRequest :: c : Channel<?(-int;-Value)> = {
+prog writeRequest :: c : ?(-int;-Value) {
     more(c)
     c.send(4)
     c.send(Value::init(2))
@@ -292,9 +301,9 @@ define writeRequest :: c : Channel<?(-int;-Value)> = {
     weaken(c)
 }`
 
-const fibCode = `extern func printf(str s,...) : int;
+const fibCode = `extern func printf(str s,...) -> int;
 
-define fib :: c : Channel<+int;-int> = {
+prog fib :: c : +int;-int = {
   int n := c.recv(); 
 
   if(n == 0 || n == 1) {
@@ -312,7 +321,7 @@ define fib :: c : Channel<+int;-int> = {
   c.send(v1 + v2)
 }
 
-define program :: c : Channel<-int> = {
+prog main :: c : -int {
  var current := 1;        
  while current < 10 { 
     Channel<-int;+int> f := exec fib; 
@@ -325,10 +334,10 @@ define program :: c : Channel<-int> = {
   c.send(-1)
 }`
 
-const isPrime = `extern func printf(str s,...) : int;
+const isPrime = `extern func printf(str s,...) -> int;
 
 # Function version of isPrime
-define func isPrimeFunc(int n) : boolean {
+func isPrimeFunc(int n) -> boolean {
   var i := 3;
   while (i < n) { 
     if (n / i * i == n) { return false; } 
@@ -338,7 +347,7 @@ define func isPrimeFunc(int n) : boolean {
 }
 
 # Program version of isPrime
-define isPrimeProg :: c : Channel<+int;-boolean> = {
+prog isPrimeProg :: c : +int;-boolean {
   int n := c.recv();
   var i := 3, done := false, ans := true;
 
@@ -355,7 +364,7 @@ define isPrimeProg :: c : Channel<+int;-boolean> = {
   c.send(ans)
 }
 
-define program :: c : Channel<-int> = {
+prog main :: c : -int {
   var current := 3;        
   int nPrimes := 2;
   while current < 100 { 
@@ -372,7 +381,7 @@ define program :: c : Channel<-int> = {
   c.send(nPrimes)
 }`
 
-const adderCode = `extern func printf(str s, ...) : int;
+const adderCode = `extern func printf(str s, ...) -> int;
 
 # Main program 
 # - Spawns a BinaryCounter and toDecimal process
@@ -382,7 +391,7 @@ const adderCode = `extern func printf(str s, ...) : int;
 # - The output of the BinaryCounter process is sent to the toDecimal
 #      process which converts the output binary stream into a decimal 
 #      representation.
-define program :: c : Channel<-int> = {
+prog main :: c : -int {
   var addStream := exec BinaryCounter, printer := exec toDecimal;
   addStream.send(getBinaryStreamFor(7));
   addStream.send(getBinaryStreamFor(5));
@@ -394,7 +403,7 @@ define program :: c : Channel<-int> = {
 # Receives two Channel<!+boolean> which each represent a stream of bits in 
 # a binary number. We read both streams bit-by-bit and output the result 
 # of adding them together. 
-define BinaryCounter :: c : Channel<+Channel<!+boolean>; +Channel<!+boolean>;?-boolean> = {
+prog BinaryCounter :: c : +Channel<!+boolean>; +Channel<!+boolean>;?-boolean = {
     # Defines the local variables for each of the channels  
     var i1 := c.recv(), i2 := c.recv();
 
@@ -437,17 +446,17 @@ define BinaryCounter :: c : Channel<+Channel<!+boolean>; +Channel<!+boolean>;?-b
     weaken(c);  
 }
 
-define func XOR (boolean a, boolean b) : boolean {
+func XOR (boolean a, boolean b) -> boolean {
     return (a && !b) || (!a && b);
 }
 
-define func getBinaryStreamFor(int n) : Channel<!+boolean> {
+func getBinaryStreamFor(int n) -> Channel<!+boolean> {
     var c := exec toBinary; 
     c.send(n); 
     return c; 
 }
 
-define toBinary :: c : Channel<+int;?-boolean> = {
+prog toBinary :: c : +int;?-boolean {
     int n := c.recv(); 
 
     while n > 0 {
@@ -463,7 +472,7 @@ define toBinary :: c : Channel<+int;?-boolean> = {
     weaken(c);
 }
 
-define toDecimal :: c : Channel<+Channel<!+boolean>> = {
+prog toDecimal :: c : +Channel<!+boolean> {
     var a := c.recv(), dec_val := 0, base := 1; 
  
     accept(a) { 
