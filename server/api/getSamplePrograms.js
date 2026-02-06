@@ -176,13 +176,13 @@ prog Database :: c : !ExternalChoice<
 
   # Helper function to log the contents of the database
   func PrintDatabase(Value[10] data) {
-      for(var i := 0; i < data.length; i := i + 1) {
-        match data[i]
-          | Value v => printf("%u, ", v.v);
-          | Unit u => printf("*, ");
-      }
-      printf("\\n");
-      return;
+    for(var i := 0; i < data.length; i := i + 1) {
+      match data[i]
+        | Value v => printf("%u, ", v.v);
+        | Unit u => printf("*, ");
+    }
+    printf("\\n");
+    return;
   }
 
   printf("Initial Database State:\\n");
@@ -207,58 +207,57 @@ prog Database :: c : !ExternalChoice<
 }
 
 prog main :: c : -int {
-    var db := exec Database;
-    var rqs := exec requests;
-    var setRq := exec writeRequest; 
+  var db := exec Database;
+  var rqs := exec requests;
+  var setRq := exec writeRequest; 
 
 
-    accept(rqs) {
-      # Process each of the requests with high-priority requests taking precedence
-      acceptIf(setRq, setRq.is_present()) {
-        printf("AcceptIf Present!\\n");
-        more(db); 
-        db[set]
-        db.send(setRq.recv())
-        db.send(setRq.recv())
-      }
-      else 
-      {
-        printf("AcceptIf Not Present!\\n");
-      }
-   
-      more(db)
-      offer rqs 
-        | +int;-OptVal => { 
-            db[get] 
-            db.send(rqs.recv())  
-            var a := db.recv();
-            rqs.send(a) 
-          } 
-        | +int;+Value => { 
-            db[set] 
-            db.send(rqs.recv()) 
-            db.send(rqs.recv()) 
-          }
-        | +int;InternalChoice<-Value;+Value, +Value> => { 
-            db[lock] 
-            db.send(rqs.recv())
-            offer db 
-                | present => { rqs[-Value;+Value] rqs.send(db.recv()) db.send(rqs.recv())}
-                | missing => { rqs[+Value] db.send(rqs.recv()) }
-          }
-  
-    }
- 
-
-    accept(setRq) {
+  accept(rqs) {
+    # Process each of the requests with high-priority requests taking precedence
+    acceptIf(setRq, setRq.is_present()) {
+      printf("AcceptIf Present!\\n");
       more(db); 
       db[set]
       db.send(setRq.recv())
       db.send(setRq.recv())
     }
+    else 
+    {
+      printf("AcceptIf Not Present!\\n");
+    }
+   
+    more(db)
+    offer rqs 
+      | +int;-OptVal => { 
+          db[get] 
+          db.send(rqs.recv())  
+          var a := db.recv();
+          rqs.send(a) 
+        } 
+      | +int;+Value => { 
+          db[set] 
+          db.send(rqs.recv()) 
+          db.send(rqs.recv()) 
+        }
+      | +int;InternalChoice<-Value;+Value, +Value> => { 
+          db[lock] 
+          db.send(rqs.recv())
+          offer db 
+            | present => { rqs[-Value;+Value] rqs.send(db.recv()) db.send(rqs.recv())}
+            | missing => { rqs[+Value] db.send(rqs.recv()) }
+        }
+  
+  }
 
-    weaken(db)
-    c.send(0);
+  accept(setRq) {
+    more(db); 
+    db[set]
+    db.send(setRq.recv())
+    db.send(setRq.recv())
+  }
+
+  weaken(db)
+  c.send(0);
 }
 
 
@@ -270,37 +269,37 @@ prog requests :: c : ?InternalChoice<
                                 -Value>> {
 
     
-    more(c)
-    c[-int;+OptVal]
-    c.send(4)
-    var opt := c.recv(); 
+  more(c)
+  c[-int;+OptVal]
+  c.send(4)
+  var opt := c.recv(); 
 
-    printf("Read Request for 4 got: ");
+  printf("Read Request for 4 got: ");
 
-    match opt
-      | Unit e => { printf("empty\\n"); }
-      | Value v => { printf("%u\\n", v.v); }
+  match opt
+    | Unit e => { printf("empty\\n"); }
+    | Value v => { printf("%u\\n", v.v); }
 
-    more(c)
-    c[-int;+OptVal]
-    c.send(20)
-    opt := c.recv(); 
+  more(c)
+  c[-int;+OptVal]
+  c.send(20)
+  opt := c.recv(); 
 
-    printf("Read Request for 20 got: ");
+  printf("Read Request for 20 got: ");
 
-    match opt
-      | Unit e => { printf("empty\\n"); }
-      | Value v => { printf("%u\\n", v.v); }
+  match opt
+    | Unit e => { printf("empty\\n"); }
+    | Value v => { printf("%u\\n", v.v); }
 
-    weaken(c)
+  weaken(c)
 }
 
 prog writeRequest :: c : ?(-int;-Value) {
-    more(c)
-    c.send(4)
-    c.send(Value::init(2))
-    
-    weaken(c)
+  more(c)
+  c.send(4)
+  c.send(Value::init(2))
+  
+  weaken(c)
 }`
 
 const fibCode = `extern func printf(str s,...) -> int;
@@ -324,15 +323,15 @@ prog fib :: c : +int;-int = {
 }
 
 prog main :: c : -int {
- var current := 1;        
- while current < 10 { 
+  var current := 1;
+  while current < 10 { 
     Channel<-int;+int> f := exec fib; 
     f.send(current)
     int i := f.recv();
 
    printf("The %dth fibonacci number is: %d\\n", current, i);
    current := current + 1; 
- }
+  }
   c.send(-1)
 }`
 
@@ -406,121 +405,121 @@ prog main :: c : -int {
 # a binary number. We read both streams bit-by-bit and output the result 
 # of adding them together. 
 prog BinaryCounter :: c : +Channel<!+boolean>; +Channel<!+boolean>;?-boolean = {
-    # Defines the local variables for each of the channels  
-    var i1 := c.recv(), i2 := c.recv();
+  # Defines the local variables for each of the channels  
+  var i1 := c.recv(), i2 := c.recv();
 
-    # Tracks the remainder we have to carry to the next bit
-    boolean carry := false; 
-    accept(i1) {
-        # Receive a boolean on i1, 
-        boolean val := i1.recv(); 
+  # Tracks the remainder we have to carry to the next bit
+  boolean carry := false; 
+  accept(i1) {
+    # Receive a boolean on i1, 
+    boolean val := i1.recv(); 
 
-        # Attempt to receive a single boolean on i2 (which could end before i1)
-        boolean val2 := false; 
-        acceptIf(i2, true) { val2 := i2.recv();}
+    # Attempt to receive a single boolean on i2 (which could end before i1)
+    boolean val2 := false; 
+    acceptIf(i2, true) { val2 := i2.recv();}
 
-        # Implements a full-adder to calculate the resulting sum and carry
-        boolean xor := XOR(val, val2); 
-        boolean sum := XOR(xor, carry); 
-        carry := (xor && carry) || (val && val2);
+    # Implements a full-adder to calculate the resulting sum and carry
+    boolean xor := XOR(val, val2); 
+    boolean sum := XOR(xor, carry); 
+    carry := (xor && carry) || (val && val2);
         
-        # Unfold one iteration of our output loop and send the sum over it
-        more(c);
-        c.send(sum);
-    }
+    # Unfold one iteration of our output loop and send the sum over it
+    more(c);
+    c.send(sum);
+  }
 
-    # As it is possible that i1 ends before i2, we have to 
-    # repeat the above process; however, only with i1. 
-    accept(i2) {
-        boolean val := i2.recv(); 
-        more(c); 
-        c.send(XOR(val, carry));
-        carry := val && carry; 
-    }
+  # As it is possible that i1 ends before i2, we have to 
+  # repeat the above process; however, only with i1. 
+  accept(i2) {
+    boolean val := i2.recv(); 
+    more(c); 
+    c.send(XOR(val, carry));
+    carry := val && carry; 
+  }
 
-    # After both channels have ended, it is possible that we have 
-    # one last bit to output. 
-    if carry {
-        more(c); 
-        c.send(carry);
-    }
+  # After both channels have ended, it is possible that we have 
+  # one last bit to output. 
+  if carry {
+    more(c); 
+    c.send(carry);
+  }
 
-    weaken(c);  
+  weaken(c);  
 }
 
 func XOR (boolean a, boolean b) -> boolean {
-    return (a && !b) || (!a && b);
+  return (a && !b) || (!a && b);
 }
 
 func getBinaryStreamFor(int n) -> Channel<!+boolean> {
-    var c := exec toBinary; 
-    c.send(n); 
-    return c; 
+  var c := exec toBinary; 
+  c.send(n); 
+  return c; 
 }
 
 prog toBinary :: c : +int;?-boolean {
-    int n := c.recv(); 
+  int n := c.recv(); 
 
-    while n > 0 {
-        more(c)
-        if n % 2 == 1 {
-            c.send(true);
-        } else {
-            c.send(false);
-        }
-        n := n / 2; 
+  while n > 0 {
+    more(c)
+    if n % 2 == 1 {
+      c.send(true);
+    } else {
+      c.send(false);
     }
+    n := n / 2; 
+  }
 
-    weaken(c);
+  weaken(c);
 }
 
 prog toDecimal :: c : +Channel<!+boolean> {
-    var a := c.recv(), dec_val := 0, base := 1; 
+  var a := c.recv(), dec_val := 0, base := 1; 
  
-    accept(a) { 
-        if a.recv() {
-            dec_val := dec_val + base; 
-        }
- 
-        base := base * 2;
+  accept(a) { 
+    if a.recv() {
+      dec_val := dec_val + base; 
     }
+
+    base := base * 2;
+  }
  
-    printf("%u\\n", dec_val);
+  printf("%u\\n", dec_val);
 }`
 
 const basicCancel = `extern func printf(str s,...) -> int;
 
 prog main :: c : -int 
 {
-    var other := exec peer;
-    other.send(1); 
-    other.send(2); 
-    cancel(other);
-    other.send(3);
-    other.send(4);
-    cancel(other); 
+  var other := exec peer;
+  other.send(1); 
+  other.send(2); 
+  cancel(other);
+  other.send(3);
+  other.send(4);
+  cancel(other); 
 
-   c.send(0);
+  c.send(0);
 }
 
 prog peer :: c : Cancelable<+int;+int>;+int;Cancelable<+int;+int> { 
-    match c.recv()
-        | Unit u => printf("First Recv: Canceled by main\\n");
-        | int i => printf("First Recv: %u (expecting 1) \\n", i);
-    cancel(c);
-    printf("Second Recv: Canceled by peer\\n");
+  match c.recv()
+    | Unit u => printf("First Recv: Canceled by main\\n");
+    | int i => printf("First Recv: %u (expecting 1) \\n", i);
+  cancel(c);
+  printf("Second Recv: Canceled by peer\\n");
 
-    printf("Third recv: %u (expected 3)\\n", c.recv());
-    
-    match c.recv() 
-        | Unit u => printf("Fourth Recv: Canceled by main\\n");
-        | int i => printf("Fourth Recv: %u (expected 4)\\n", i);
+  printf("Third recv: %u (expected 3)\\n", c.recv());
+  
+  match c.recv() 
+    | Unit u => printf("Fourth Recv: Canceled by main\\n");
+    | int i => printf("Fourth Recv: %u (expected 4)\\n", i);
 
-    match c.recv() 
-        | Unit u => printf("Fifth Recv: Canceled by main (expected)\\n");
-        | int i => printf("Fifth Recv: %u (Expected Canceled)\\n", i);
+  match c.recv() 
+    | Unit u => printf("Fifth Recv: Canceled by main (expected)\\n");
+    | int i => printf("Fifth Recv: %u (Expected Canceled)\\n", i);
 
-    cancel(c);
+  cancel(c);
 }`;
 
 

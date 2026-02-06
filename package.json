@@ -16,7 +16,7 @@
     "highlight.js": "11.8.0",
     "node-docker-api": "^1.1.22",
     "prismjs": "^1.29.0",
-    "simple-code-editor": "git+https://github.com/ahfriedman/simple-code-editor.git",
+    "simple-code-editor": "^2.1.0",
     "tar-stream": "^3.0.0",
     "vue-prism-editor": "^2.0.0-alpha.2"
   }

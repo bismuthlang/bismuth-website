@@ -16,8 +16,8 @@ const { data: Programs } = await useFetch('/api/getSamplePrograms', { method: 'g
               <option v-for="pid in Object.keys(Programs)" :value="pid">{{ pid }}</option>
             </select>
           </span>
-          <CodeEditor font_size="15px" theme="light" class="my-editor col-span-2 lg:col-span-1 lg:m-0" :display_language="false" height="38rem" v-model="code"
-          :languages="[['tbd', 'TBD']]"></CodeEditor>
+          <CodeEditor theme="atom-one-light" :line-nums="true" :displayLanguage="false" font-size="15px"  class="my-editor col-span-2 lg:col-span-1 lg:m-0"  height="38rem" v-model="code"
+          :languages="[['bismuth', 'Bismith']]"></CodeEditor>
         </div>
 
         <div class="flex capped-width max-h-[41.125rem] flex-col col-span-2 lg:col-span-1 m-6 lg:m-0 lg:pt-[50px]">
@@ -35,9 +35,9 @@ const { data: Programs } = await useFetch('/api/getSamplePrograms', { method: 'g
 import hljs from "highlight.js";
 import CodeEditor from 'simple-code-editor';
 
-hljs.registerLanguage("tbd", (hljs) => ({
-  name: "Tbd",
-  aliases: ["tbd", "TBD"],
+hljs.registerLanguage("bismuth", (hljs) => ({
+  name: "Bismith",
+  aliases: ["bismuth", "Bismith"],
   keywords: {
     keyword: "if while else func prog extern match offer return select exit struct enum accept acceptWhile more weaken unfold acceptIf for",
     type: "int u32 i32 u64 i64 boolean str var Channel Program InternalChoice ExternalChoice"
@@ -85,8 +85,8 @@ export default {
       this.isLoading = true;       
       this.terminalText = "Bismuth Pre-Alpha v1.3.7\n$ "
       // const { data: resData } = await useFetch('/api/compile')
-      const { data: resData } = await useFetch('/api/compile', { method: 'post', body: { code: this.code } })
-      this.terminalText = resData._rawValue.data;
+      const { data } = await useFetch('/api/compile', { method: 'post', body: { code: this.code } })
+      this.terminalText = data.value.data;
       this.isLoading = false; 
     },
     selectChange: async function(Programs)  {
@@ -127,35 +127,19 @@ export default {
   /* we don't use `language-` classes anymore so thats why we need to add background and text color manually */
   /* background: #2d2d2d; */
   /* background-color: transparent !important; */
-  color: #3b3535fa;
 
   font-variant-ligatures: none;
 
   /* you must provide font-family font-size line-height. Example: */
   font-family: Fira code, Fira Mono, Consolas, Menlo, monospace;
   line-height: 1.5;
-  padding: 5px;
 
-  background: rgba(255, 255, 255, 0.25);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
 
   width: 100% !important;
 }
 
-/* optional class for removing the outline */
-.prism-editor__textarea:focus {
-  outline: none;
-}
-
-.atom_one_light.hljs,
-.atom_one_light .hljs {
-  /* .atom_one_dark.hljs, .atom_one_dark .hljs  */
-  background-color: transparent !important;
-}
 
 .terminal {
   font-size: 15px; 
