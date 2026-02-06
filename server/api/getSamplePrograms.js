@@ -6,6 +6,8 @@ export default defineEventHandler(async (event) => {
     "Fibonacci Sequence": fibCode,
     "Prime Number Finder": isPrime, 
     "Binary Stream Adder": adderCode,
+    "Timeout Handler": timeoutHandler,
+    "Basic Cancel": basicCancel
 
   }
 })
@@ -94,7 +96,7 @@ func printBT(BinaryTree node)
     Box<BinaryTree> n => traversePreOrder(0, "└──", *n);
   }
 
-  printf("\n");
+  printf("\\n");
   return; 
 }
 
@@ -102,7 +104,7 @@ func traversePreOrder(int padding, str prefix, BinaryTree node) {
   printSpaces(padding);
   printf(prefix);
   printf("%u", node.value);
-  printf("\n");
+  printf("\\n");
 
   match node.lhs {
     Empty e => {}
@@ -484,4 +486,101 @@ prog toDecimal :: c : +Channel<!+boolean> {
     }
  
     printf("%u\\n", dec_val);
+}`
+
+const basicCancel = `extern func printf(str s,...) -> int;
+
+prog main :: c : -int 
+{
+    var other := exec peer;
+    other.send(1); 
+    other.send(2); 
+    cancel(other);
+    other.send(3);
+    other.send(4);
+    cancel(other); 
+
+   c.send(0);
+}
+
+prog peer :: c : Cancelable<+int;+int>;+int;Cancelable<+int;+int> { 
+    match c.recv()
+        | Unit u => printf("First Recv: Canceled by main\\n");
+        | int i => printf("First Recv: %u (expecting 1) \\n", i);
+    cancel(c);
+    printf("Second Recv: Canceled by peer\\n");
+
+    printf("Third recv: %u (expected 3)\\n", c.recv());
+    
+    match c.recv() 
+        | Unit u => printf("Fourth Recv: Canceled by main\\n");
+        | int i => printf("Fourth Recv: %u (expected 4)\\n", i);
+
+    match c.recv() 
+        | Unit u => printf("Fifth Recv: Canceled by main (expected)\\n");
+        | int i => printf("Fifth Recv: %u (Expected Canceled)\\n", i);
+
+    cancel(c);
+}`;
+
+
+
+const timeoutHandler = `extern func printf(str s, ...) -> int;
+# This program demonstrates how proxy processes can implement a timeout on 
+# a data stream. 
+prog main :: c : -int {
+  var unsafe := exec direct;
+  var prox := exec proxied;
+  var l := prox.recv(), r := unsafe.recv();
+  c.send(0)
+}
+
+prog proxied :: c : -int {
+  var prod := exec producer;
+  var safeProd := makeTimeout(prod);
+  accept(safeProd) {
+    printf("%u\\n", safeProd.recv());
+  }
+  printf("Safe version finished\\n");
+  c.send(0)
+}
+
+prog direct :: c : -int {
+  var prod := exec producer;
+  accept(prod) {
+    match prod.recv()
+     | Unit u => printf("Unit\\n");
+     | int i => printf("%u\\n");
+  }
+  cancel(prod);
+  printf("Unsafe version finished\\n");
+  c.send(0)
+}
+
+func makeTimeout (Channel<Cancelable<!+int>> c) -> Channel<!+int> {
+  prog timeoutHandler :: c : +Channel<Cancelable<!+int>>; ?-int {
+    var orig := c.recv(), now := 0;
+    while now < 10 {
+      acceptIf(orig, orig.is_present()) {
+        match orig.recv()
+         | Unit u => { now := 100; }
+         | int i => { unfold(c); c.send(i); now := 0; }
+      }
+      else { now := now + 1; }
+    }
+    cancel(orig);
+    weaken(c);
+  }
+
+  var ans := exec timeoutHandler;
+  ans.send(c);
+  return ans;
+}
+
+prog producer :: c : Cancelable<?-int> {
+  var sum := 0;
+  for (var i := 0; i < 100000000; i := i + 1) {
+
+  }
+  cancel (c)
 }`
